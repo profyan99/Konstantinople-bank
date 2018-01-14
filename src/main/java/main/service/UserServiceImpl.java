@@ -2,41 +2,43 @@ package main.service;
 
 import main.dao.UserDao;
 import main.dao.UserDaoImpl;
+import main.entity.Bill;
+import main.entity.Transaction;
 import main.entity.User;
+import main.response.UserProfile;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.CollectionUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 @Service("userService")
 public class UserServiceImpl implements UserService {
 
-    private final
-    UserDaoImpl userDao;
+
+    private final UserDao userDao;
 
     @Autowired
-    public UserServiceImpl(UserDaoImpl userDao) {
+    public UserServiceImpl(UserDao userDao) {
         this.userDao = userDao;
     }
 
     @Override
     public void save(User user) throws Exception {
-        userDao.update(user);
+        userDao.save(user);
     }
 
     @Override
-    public List<User> findAll() {
-        List<User> list = new ArrayList<>();
-        list.addAll((userDao.findAll()));
-       // userDao.findAll().forEach(list::add);
+    public List<UserProfile> findAll() {
+        List<UserProfile> list = new ArrayList<>();
+        userDao.findAll().forEach(list::add);
         return list;
     }
 
     @Override
     public User getById(long id) {
-        return userDao.findById(id);
+        return userDao.findOne(id);
     }
 
     @Override
@@ -54,8 +56,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public long create(User user) {
-        userDao.create(user);
+    public long create(UserProfile userProfile) {
+        User user = new User(userProfile.getName(), userProfile.getEmail(), userProfile.getPassword(),
+                userProfile.getDescription(), userProfile.getAddress(), userProfile.getAge());
+        userDao.save(user);
         return user.getId();
+    }
+    @Override
+    public Set<Bill> getUserBills(long id) {
+        return userDao.findOne(id).getBills();
+    }
+
+    @Override
+    public Set<Transaction> getUserTransactions(long id) {
+        return userDao.findOne(id).getTransactions();
+    }
+
+    @Override
+    public UserProfile getUserProfile(long id) {
+        return userDao.findOne(id);
     }
 }

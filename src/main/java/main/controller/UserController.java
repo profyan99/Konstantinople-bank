@@ -1,7 +1,10 @@
 package main.controller;
 
 import main.dao.UserDao;
+import main.entity.Bill;
+import main.entity.Transaction;
 import main.entity.User;
+import main.response.UserProfile;
 import main.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,8 +16,11 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.jws.soap.SOAPBinding;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.List;
+import java.util.Set;
 
-@Controller
+@RestController
+@RequestMapping(value = "/users")
 public class UserController {
 
     private final UserServiceImpl userService;
@@ -24,51 +30,50 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping(value = "/")
-    public String index() {
-        return "index";
-    }
-
-    @RequestMapping(value = "/registration", method = RequestMethod.GET)
-    public String registration(Model model) {
-        model.addAttribute("user",new User());
-        return "registration";
-    }
-
-    @PostMapping(value = "/registration")
-    public String createUser(@ModelAttribute(value = "user") User user) {
-        String link = "registration";
+    @PostMapping(path = "/registration")
+    public String createUser(@RequestParam("user") UserProfile user) {
+        String link = "success";
         if(userService.getByName(user.getName()) == null) {
             long id = userService.create(user);
-            link = "redirect:/user/" + id;
         }
+        else
+            link = "error";
         return link;
     }
 
 
-    @GetMapping(value = "/login")
-    public String login() {
-        return "login";
-    }
-
-    @PostMapping(value = "/login")
-    public String loginUser(@ModelAttribute("login") String login,
-                            @ModelAttribute("password") String password, Model model) {
+    @PostMapping(path = "/login")
+    public String loginUser(@RequestParam("login") String login,
+                            @RequestParam("password") String password) {
         User user;
-        String link = "login";
+        String link = "success";
         if((user = userService.getByName(login)) != null) {
-            if(user.getPassword().equals(password))
-                link = "redirect:/user/" + user.getId();
-            else {
-                model.addAttribute("Invalid password");
+            if(!user.getPassword().equals(password)) {
+                link = "invalid password";
             }
         }
+        else
+            link = "Not registered";
         return link;
     }
 
-    @GetMapping(value = "/user/{id}")
-    public String userProfile(@PathVariable("id") long id, Model model) {
-        model.addAttribute("user", userService.getById(id));
-        return "userProfile";
+    @GetMapping(path = "/user/{id}")
+    public @ResponseBody UserProfile userProfile(@PathVariable("id") long id) {
+        return userService.getUserProfile(id);
+    }
+
+    @GetMapping(path = "/user/{id}/bills")
+    public @ResponseBody Set<Bill> userBills(@PathVariable("id") long id) {
+        return userService.getUserBills(id);
+    }
+
+    @GetMapping(path = "/user/{id}/transactions")
+    public @ResponseBody Set<Transaction> userTransactions(@PathVariable("id") long id) {
+        return userService.getUserTransactions(id);
+    }
+
+    @GetMapping(path = "/userlist")
+    public @ResponseBody List<UserProfile> userList() {
+        return userService.findAll();
     }
 }
