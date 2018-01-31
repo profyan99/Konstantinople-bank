@@ -1,22 +1,32 @@
 package main.service;
 
 import main.dao.UserDao;
-import main.dao.UserDaoImpl;
 import main.entity.Bill;
+import main.entity.Role;
 import main.entity.Transaction;
 import main.entity.User;
 import main.response.UserProfile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.CollectionUtils;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+;
+
+/**
+ * Implementation of {@link UserService} interface
+ *
+ * @author Konstantin Artushkevich
+ * @version 1.0
+ */
 
 @Service("userService")
 public class UserServiceImpl implements UserService {
 
-
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final UserDao userDao;
 
     @Autowired
@@ -25,8 +35,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void save(User user) throws Exception {
+    public long save(User user) throws Exception {
         userDao.save(user);
+        return user.getId();
     }
 
     @Override
@@ -37,12 +48,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getById(long id) {
-        return userDao.findOne(id);
+    public  Optional<User> getById(long id) {
+        return userDao.findById(id);
     }
 
     @Override
-    public User getByName(String name) {
+    public Optional<User> getByName(String name) {
         return userDao.findByName(name);
     }
 
@@ -57,8 +68,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public long create(UserProfile userProfile) {
-        User user = new User(userProfile.getName(), userProfile.getEmail(), userProfile.getPassword(),
-                userProfile.getDescription(), userProfile.getAddress(), userProfile.getAge());
+        User user = new User(
+                userProfile.getName(),
+                userProfile.getEmail(),
+                new BCryptPasswordEncoder().encode(userProfile.getPassword()),
+                userProfile.getDescription(),
+                userProfile.getAddress(),
+                userProfile.getAge(),
+                new HashSet<>(Collections.singletonList(Role.USER)));
+
         userDao.save(user);
         return user.getId();
     }

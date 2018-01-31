@@ -4,7 +4,16 @@ import lombok.*;
 
 import javax.persistence.*;
 
-import org.springframework.data.annotation.Id;
+
+import java.util.Date;
+
+/**
+ * Simple JavaBean domain object that represents
+ * transactions of {@link User} and User's {@link Bill}.
+ *
+ * @author Konstantin Artushkevich
+ * @version 1.0
+ */
 
 @Entity
 @Table(name = "transactions")
@@ -21,10 +30,17 @@ public class Transaction {
     private User user;
 
     @ManyToOne
+    @JoinColumn(name = "bill_id")
     private Bill bill;
 
+    @Column(name = "amount")
     private int amount;
 
+    @Column(name = "date")
+    @Temporal(value = TemporalType.DATE)
+    Date date;
+
+    @Column(name = "description")
     private String description;
 
 }

@@ -1,11 +1,17 @@
 package main.entity;
 
 import lombok.*;
-import org.springframework.data.annotation.Id;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
+
+/**
+ * Simple JavaBean domain object that represents bill of {@link User}.
+ *
+ * @author Konstantin Artushkevich
+ * @version 1.0
+ */
 
 @Entity
 @Table(name = "bills")
@@ -15,12 +21,11 @@ import java.util.Set;
 public class Bill {
 
     @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany(mappedBy = "bill", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)

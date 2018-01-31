@@ -1,18 +1,25 @@
 package main.controller;
 
 import main.entity.Transaction;
+import main.service.TransactionService;
 import main.service.TransactionServiceImpl;
-import org.omg.IOP.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Controller, which handle queries of {@link Transaction}
+ *
+ * @author Konstantin Artushkevich
+ * @version 1.0
+ */
+
 @RestController
 @RequestMapping(value = "/transactions")
 public class TransactionController {
 
-    private final TransactionServiceImpl service;
+    private final TransactionService service;
 
     @Autowired
     public TransactionController(TransactionServiceImpl service) {

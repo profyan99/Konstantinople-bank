@@ -6,16 +6,24 @@ import main.entity.User;
 import main.response.UserProfile;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Service class for {@link User}
+ *
+ * @author Konstantin Artushkevich
+ * @version 1.0
+ */
+
 public interface UserService {
-    void save(User user) throws Exception;
+    long save(User user) throws Exception;
 
-    List<? extends UserProfile> findAll();
+    List<UserProfile> findAll();
 
-    User getById(long id);
+    Optional<User> getById(long id);
 
-    User getByName(String name);
+    Optional<User> getByName(String name);
 
     void update(User user);
 

@@ -1,0 +1,30 @@
+{
+  "name": "vuejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "vue-loader": "^13.7.0",
+    "vue-template-compiler": "^2.5.13"
+  },
+  "devDependencies": {
+    "axios": "^0.17.1",
+    "browserify": "*",
+    "css-loader": "^0.28.9",
+    "qs": "^6.5.1",
+    "vue": "*",
+    "vue-router": "^3.0.1",
+    "vueify": "*",
+    "vuex": "^3.0.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "browserify -t vueify -e main.js -o build.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "browser": {
+    "vue": "vue/dist/vue.common.js"
+  }
+}

@@ -8,7 +8,15 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+
+/**
+ * Implementation of {@link TransactionService} interface
+ *
+ * @author Konstantin Artushkevich
+ * @version 1.0
+ */
+
+@Service("transactionService")
 public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionDao transactionDao;
@@ -32,6 +40,6 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public List<Transaction> getAllTransactionsByUserName(String name) {
-        return transactionDao.findAllTransactionsByUserName(name);
+        return transactionDao.findByUserName(name);
     }
 }
