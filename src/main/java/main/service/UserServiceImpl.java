@@ -9,6 +9,7 @@ import main.response.UserProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -63,7 +64,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete(User user) {
-        userDao.delete(user);
+        userDao.delete(user.getId());
     }
 
     @Override
@@ -82,16 +83,21 @@ public class UserServiceImpl implements UserService {
     }
     @Override
     public Set<Bill> getUserBills(long id) {
-        return userDao.findOne(id).getBills();
+        return userDao.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("id: "+id))
+                .getBills();
     }
 
     @Override
     public Set<Transaction> getUserTransactions(long id) {
-        return userDao.findOne(id).getTransactions();
+        return userDao.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("id: "+id))
+                .getTransactions();
     }
 
     @Override
     public UserProfile getUserProfile(long id) {
-        return userDao.findOne(id);
+        return userDao.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("id: "+id));
     }
 }

@@ -35,7 +35,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Transaction getTransactionById(long id) {
-        return transactionDao.findOne(id);
+        return transactionDao.findById(id);
     }
 
     @Override
