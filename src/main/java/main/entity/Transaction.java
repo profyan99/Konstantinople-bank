@@ -27,10 +27,11 @@ public class Transaction {
     private long id;
 
     @ManyToOne
+    @JoinColumn(name = "user")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "bill_id")
+    @JoinColumn(name = "bill")
     private Bill bill;
 
     @Column(name = "amount")

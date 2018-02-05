@@ -45,7 +45,7 @@ public class User extends UserProfile {
     private Set<Transaction> transactions = new HashSet<>();
 
     @ElementCollection(targetClass = Role.class)
-    @JoinTable(name = "userRoles", joinColumns = @JoinColumn(name = "userID"))
+    @JoinTable(name = "userRoles", joinColumns = @JoinColumn(name = "user"))
     @Enumerated(EnumType.STRING)
     private Set<Role> roles = new HashSet<>();
 

@@ -6,20 +6,24 @@ import main.security.SecurityAuthenticationSuccessHandler;
 import main.security.SecurityLogoutSuccessHandler;
 import main.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import javax.sql.DataSource;
 import java.util.Arrays;
 
 /**
@@ -43,39 +47,66 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userService;
 
+    private final PasswordEncoder bcryptPasswordEncoder;
+
     @Autowired
-    public SecurityConfig(UserDetailsServiceImpl userService, SecurityAuthenticationEntryPoint authenticationEntryPoint, SecurityAuthenticationFailureHandler authenticationFailureHandler, SecurityAuthenticationSuccessHandler authenticationSuccessHandler, SecurityLogoutSuccessHandler logoutSuccessHandler) {
+    public SecurityConfig(UserDetailsServiceImpl userService, SecurityAuthenticationEntryPoint authenticationEntryPoint,
+                          SecurityAuthenticationFailureHandler authenticationFailureHandler,
+                          SecurityAuthenticationSuccessHandler authenticationSuccessHandler,
+                          SecurityLogoutSuccessHandler logoutSuccessHandler, PasswordEncoder bcryptPasswordEncoder) {
         this.userService = userService;
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.logoutSuccessHandler = logoutSuccessHandler;
+        this.bcryptPasswordEncoder = bcryptPasswordEncoder;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .cors()
+                    .cors()
                 .and()
-                .authorizeRequests()
-                .antMatchers("/", "/registration", "/home").permitAll()
-                .anyRequest().authenticated()
+                    .authorizeRequests()
+                    .antMatchers("/", "/registration", "/home")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated()
                 .and()
-                .formLogin().permitAll()
+                    .formLogin()
+                    .successHandler(authenticationSuccessHandler)
+                    .failureHandler(authenticationFailureHandler)
+                    .permitAll()
                 .and()
-                .logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).permitAll();
-
-        http.csrf().disable();
-        http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint);
-        http.formLogin().successHandler(authenticationSuccessHandler);
-        http.formLogin().failureHandler(authenticationFailureHandler);
-        http.logout().logoutSuccessHandler(logoutSuccessHandler);
+                    .logout()
+                    .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                    .logoutSuccessHandler(logoutSuccessHandler)
+                    .deleteCookies("JSESSIONID")
+                    .permitAll()
+                .and()
+                    .exceptionHandling()
+                    .authenticationEntryPoint(authenticationEntryPoint)
+                .and()
+                    .rememberMe()
+                    .tokenRepository(persistentTokenRepository())
+                    .rememberMeParameter("remember-me")
+                    .tokenValiditySeconds(60*24*14)
+                .and()
+                    .csrf().disable();
 
     }
 
     @Bean
-    public PasswordEncoder bcryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
+    @ConfigurationProperties(prefix = "spring.datasource")
+    public DataSource dataSource() {
+        return DataSourceBuilder.create().build();
+    }
+
+    @Bean
+    public PersistentTokenRepository persistentTokenRepository() {
+        JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
+        tokenRepository.setDataSource(dataSource());
+        return tokenRepository;
     }
 
     @Bean
@@ -83,9 +114,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(
                 Arrays.asList(
-                        "http://localhost:8080",
-                        "http://localhost:8088",
-                        "http://localhost:8088/login")
+                        "http://bank")
         );
         configuration.setAllowedMethods(Arrays.asList("GET","POST"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -98,6 +127,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth
                 .userDetailsService(userService)
-                .passwordEncoder(bcryptPasswordEncoder());
+                .passwordEncoder(bcryptPasswordEncoder);
     }
 }

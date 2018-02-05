@@ -25,20 +25,18 @@ import java.io.PrintWriter;
 @Component
 public class SecurityAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    private final
-    UserService service;
-
     @Autowired
-    public SecurityAuthenticationSuccessHandler(UserService service) {
-        this.service = service;
-    }
+    private UserService service;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
-                                        Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(
+            HttpServletRequest httpServletRequest,
+            HttpServletResponse httpServletResponse,
+                                        Authentication authentication
+    ) throws IOException, ServletException {
 
         httpServletResponse.setStatus(HttpServletResponse.SC_OK);
-        httpServletResponse.setHeader("Access-Control-Allow-Origin", "*");
+        httpServletResponse.setHeader("Access-Control-Allow-Origin", "http://bank");
         PrintWriter writer = httpServletResponse.getWriter();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         long id = service.getByName(userDetails.getUsername())

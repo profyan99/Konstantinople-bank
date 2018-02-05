@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -27,10 +28,16 @@ import java.util.*;
 public class UserServiceImpl implements UserService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final UserDao userDao;
+    private UserDao userDao;
+    private PasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao) {
+    public void setbCryptPasswordEncoder(PasswordEncoder bCryptPasswordEncoder) {
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
+
+    @Autowired
+    public void setUserDao(UserDao userDao) {
         this.userDao = userDao;
     }
 
@@ -71,7 +78,7 @@ public class UserServiceImpl implements UserService {
         User user = new User(
                 userProfile.getName(),
                 userProfile.getEmail(),
-                new BCryptPasswordEncoder().encode(userProfile.getPassword()),
+                bCryptPasswordEncoder.encode(userProfile.getPassword()),
                 userProfile.getDescription(),
                 userProfile.getAddress(),
                 userProfile.getAge(),

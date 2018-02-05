@@ -47,8 +47,8 @@ module.exports = {
                     username: this.login,
                     password: this.password
                 })*/
-                axios.post('/login', qs.stringify(
-                {
+                axios.post('/login', 
+                qs.stringify({
                     username: this.login,
                     password: this.password
                 }))

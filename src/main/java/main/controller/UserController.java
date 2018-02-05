@@ -30,15 +30,16 @@ import java.util.Set;
 @CrossOrigin
 public class UserController {
 
-    private final UserService userService;
+
+    private UserService userService;
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
-    @Autowired
-    public UserController(UserServiceImpl userService) {
-        this.userService = userService;
-    }
 
     @PostMapping(value = "/registration", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createUser(@RequestBody UserProfile user) throws Exception {
@@ -59,37 +60,6 @@ public class UserController {
         }
         return resp;
     }
-
-
-
-   /* Not need, because we have spring security
-
-    @PostMapping(value = "/login",consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> loginUser(@RequestBody String login,
-                            @RequestBody String password) {
-
-        logger.error("Pre-validate | login: "+login+" password: "+password);
-        validateUser(login);
-        ResponseEntity resp;
-        if(userService
-                .getByName(login)
-                .map((account) ->
-                        account.getPassword().equals(password))
-                .orElse(false)) {
-
-            HttpHeaders httpHeaders = new HttpHeaders();
-            httpHeaders.setLocation(ServletUriComponentsBuilder
-                    .fromUriString("/")
-                    .build()
-                    .toUri());
-            resp = new ResponseEntity<>(null, httpHeaders, HttpStatus.OK);
-        }
-        else {
-            logger.info("Not found user");
-            resp = new ResponseEntity<>("Invalid password", null, HttpStatus.UNAUTHORIZED);
-        }
-        return resp;
-    }*/
 
     @GetMapping(value = "/user/{id}")
     public @ResponseBody UserProfile userProfile(@PathVariable("id") long id) {
