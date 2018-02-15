@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.konstantinoplebank.dao.mapper.TransactionMapper">
+
+    <resultMap type="Transaction" id="TransactionResult">
+        <id 	property="id" column="id"/>
+        <result property="amount" column="amount"/>
+        <result property="date" column="date"/>
+        <result property="description" column="description"/>
+        <association property="bill"
+                     column="bill"
+                     javaType="com.konstantinoplebank.entity.Bill"
+                     select="com.konstantinoplebank.dao.mapper.BillMapper.findBillById"
+                     fetchType="eager"
+        />
+
+    </resultMap>
+
+    <select id="findTransactionById" parameterType="_long" resultType="Transaction">
+        select * from transactions WHERE id=#{id}
+    </select>
+
+    <select id="findTransactionsByUserId" parameterType="_long" resultMap="TransactionResult">
+        select * from transactions where user=#{studId}
+    </select>
+
+    <update id="updateTransaction" parameterType="Transaction">
+        UPDATE transactions SET amount=#{amount}, description=#{description},  date=#{date} WHERE id=#{id}
+    </update>
+
+    <insert id="createTransaction" parameterType="Transaction">
+        INSERT INTO transactions(amount, date, description, bill, user) VALUES (#{amount}, #{date}, #{description},
+        #{bill.id}, #{user.id})
+    </insert>
+
+</mapper>

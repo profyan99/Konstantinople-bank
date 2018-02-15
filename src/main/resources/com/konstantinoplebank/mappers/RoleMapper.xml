@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.konstantinoplebank.dao.mapper.RoleMapper">
+
+    <resultMap type="Role" id="RoleResult">
+        <id 	property="id" column="id"/>
+        <result property="role" column="role" typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+    </resultMap>
+
+    <select id="findRoleByUserId" parameterType="_long" resultMap="RoleResult">
+        select * from user_roles WHERE user=#{id}
+    </select>
+
+    <insert id="createRole">
+        INSERT INTO user_roles
+        <foreach collection="roles" item="role"  index="index"  separator="," >
+            (user, roles) VALUES (#{userid}, #{role})
+        </foreach>
+    </insert>
+
+    <update id="updateRole">
+        UPDATE user_roles SET
+        <foreach collection="roles" item="role"  index="index"  separator="," >
+            roles=#{role} WHERE user=#{userid}
+        </foreach>
+    </update>
+
+</mapper>

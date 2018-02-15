@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.konstantinoplebank.dao.mapper.BillMapper">
+
+    <resultMap type="Bill" id="BillResult">
+        <id 	property="id" column="id"/>
+        <result property="amount" column="amount"/>
+        <collection property="transactions"
+                    column="transaction"
+                    javaType="ArrayList"
+                    ofType="com.konstantinoplebank.entity.Transaction"
+                    select="com.konstantinoplebank.dao.mapper.Transaction.findTransactionById"
+                    fetchType="eager"
+        />
+
+    </resultMap>
+
+    <select id="findBillById" parameterType="_long" resultType="Bill">
+        select * from bills WHERE id=#{id}
+    </select>
+
+    <select id="findBillsByUserId" parameterType="_long" resultMap="BillResult">
+        select * from bills where user=#{studId}
+    </select>
+    
+    <insert id="createBill" parameterType="Bill">
+        INSERT INTO bills(amount, user) VALUES (#{amount}, #{user.id})
+    </insert>
+
+    <update id="updateBill" parameterType="Bill">
+        BEGIN
+        UPDATE bills SET amount=#{amount} WHERE id=#{id}
+        <foreach collection="transactions" item="trans"  index="index"  separator="," >
+            <include refid="updateTransaction">
+                <property name="Transaction" value="#{trans}"/>
+            </include>
+        </foreach>;
+        END;
+    </update>
+</mapper>
