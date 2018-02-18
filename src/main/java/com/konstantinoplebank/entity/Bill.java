@@ -25,4 +25,9 @@ public class Bill {
     private Set<Transaction> transactions = new HashSet<>();
 
     private long amount;
+
+    public Bill(User user, long amount) {
+        this.user = user;
+        this.amount = amount;
+    }
 }

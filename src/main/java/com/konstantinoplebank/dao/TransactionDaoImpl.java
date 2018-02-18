@@ -5,10 +5,12 @@ import com.konstantinoplebank.dao.mapper.UserMapper;
 import com.konstantinoplebank.entity.Transaction;
 import org.apache.ibatis.session.SqlSession;
 import org.mybatis.spring.support.SqlSessionDaoSupport;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public class TransactionDaoImpl extends SqlSessionDaoSupport implements TransactionDao {
 
     @Override
@@ -35,15 +37,6 @@ public class TransactionDaoImpl extends SqlSessionDaoSupport implements Transact
             session
                     .getMapper(TransactionMapper.class)
                     .createTransaction(transaction);
-        }
-    }
-
-    @Override
-    public void updateTransaction(Transaction transaction) {
-        try (SqlSession session = getSqlSession()) {
-            session
-                    .getMapper(TransactionMapper.class)
-                    .updateTransaction(transaction);
         }
     }
 }

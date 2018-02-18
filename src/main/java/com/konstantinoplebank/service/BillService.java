@@ -1,18 +1,19 @@
-package com.konstantinoplebank.dao;
+package com.konstantinoplebank.service;
 
 import com.konstantinoplebank.entity.Bill;
-import org.springframework.stereotype.Repository;
+import com.konstantinoplebank.entity.Transaction;
 
 import java.util.List;
 import java.util.Optional;
 
-@Repository
-public interface BillDao {
+public interface BillService {
     Optional<Bill> findBillById(long id);
 
     List<Bill> findBillsByUserId(long id);
 
-    void createBill(Bill bill);
+    long createBill(long userid, long amount);
+
+    void applyTransaction(Transaction transaction);
 
     void updateAmount(long billId, long amount);
 }

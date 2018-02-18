@@ -2,6 +2,7 @@ package com.konstantinoplebank.controller;
 
 import com.konstantinoplebank.entity.Bill;
 import com.konstantinoplebank.entity.User;
+import com.konstantinoplebank.response.SimpleResponse;
 import com.konstantinoplebank.response.UserProfile;
 import com.konstantinoplebank.service.UserService;
 import com.konstantinoplebank.service.UserServiceImpl;
@@ -27,7 +28,6 @@ import java.util.Set;
  */
 
 @RestController
-@CrossOrigin
 public class UserController {
 
     private final UserService userService;
@@ -36,7 +36,7 @@ public class UserController {
 
 
     @Autowired
-    public UserController(UserServiceImpl userService) {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
@@ -52,32 +52,32 @@ public class UserController {
                     .path("/{id}")
                     .buildAndExpand(id)
                     .toUri());
-            resp = new ResponseEntity<>(null, headers, HttpStatus.CREATED);
+            resp = new ResponseEntity<>(headers, HttpStatus.CREATED);
         }
         else {
-            resp = new ResponseEntity<>("Already registered", null, HttpStatus.FORBIDDEN);
+            resp = new ResponseEntity<>(new SimpleResponse("Already registered"), HttpStatus.FORBIDDEN);
         }
         return resp;
     }
 
     @GetMapping(value = "/user/{id}")
-    public @ResponseBody UserProfile userProfile(@PathVariable("id") long id) {
-        return userService.getUserProfile(id);
+    public ResponseEntity<?> userProfile(@PathVariable("id") long id) {
+        return new ResponseEntity<>(userService.getUserProfile(id), HttpStatus.OK);
     }
 
     @GetMapping(value = "/user/{id}/bills")
-    public @ResponseBody Set<Bill> userBills(@PathVariable("id") long id) {
-        return userService.getUserBills(id);
+    public ResponseEntity<?> userBills(@PathVariable("id") long id) {
+        return new ResponseEntity<>(userService.getUserBills(id), HttpStatus.OK);
     }
 
     @GetMapping(value = "/user/{id}/transactions")
-    public @ResponseBody Set<Transaction> userTransactions(@PathVariable("id") long id) {
-        return userService.getUserTransactions(id);
+    public ResponseEntity<?> userTransactions(@PathVariable("id") long id) {
+        return new ResponseEntity<>(userService.getUserTransactions(id), HttpStatus.OK);
     }
 
     @GetMapping(value = "/user/userlist")
-    public @ResponseBody List<UserProfile> userList() {
-        return userService.findAll();
+    public ResponseEntity<?> userList() {
+        return new ResponseEntity<>(userService.findAll(), HttpStatus.OK);
     }
 
 }

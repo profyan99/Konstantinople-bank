@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
                 userProfile.getAge(),
                 new HashSet<>(Collections.singletonList(Role.USER)));
 
-        userDao.save(user);
+        userDao.create(user);
         return user.getId();
     }
     @Override

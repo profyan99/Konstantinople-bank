@@ -1,6 +1,7 @@
 package com.konstantinoplebank.dao.mapper;
 
 import com.konstantinoplebank.entity.Transaction;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -10,6 +11,4 @@ public interface TransactionMapper {
     List<Transaction> findTransactionsByUserId(long id);
 
     void createTransaction(Transaction transaction);
-
-    void updateTransaction(Transaction transaction);
 }

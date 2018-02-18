@@ -25,10 +25,17 @@ public class Transaction {
 
     private Bill bill;
 
-    private int amount;
+    private long amount;
 
     Date date;
 
     private String description;
 
+    public Transaction(User user, Bill bill, long amount, Date date, String description) {
+        this.user = user;
+        this.bill = bill;
+        this.amount = amount;
+        this.date = date;
+        this.description = description;
+    }
 }

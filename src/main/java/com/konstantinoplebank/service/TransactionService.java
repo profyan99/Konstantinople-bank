@@ -17,4 +17,7 @@ public interface TransactionService {
     Transaction getTransactionById(long id);
 
     List<Transaction> getAllTransactionsByUserName(String name);
+
+    void createTransaction(long userid, long billid, long amount, String description);
+
 }

@@ -27,11 +27,7 @@
         select * from transactions where user=#{studId}
     </select>
 
-    <update id="updateTransaction" parameterType="Transaction">
-        UPDATE transactions SET amount=#{amount}, description=#{description},  date=#{date} WHERE id=#{id}
-    </update>
-
-    <insert id="createTransaction" parameterType="Transaction">
+    <insert id="createTransaction"  parameterType="Transaction" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
         INSERT INTO transactions(amount, date, description, bill, user) VALUES (#{amount}, #{date}, #{description},
         #{bill.id}, #{user.id})
     </insert>

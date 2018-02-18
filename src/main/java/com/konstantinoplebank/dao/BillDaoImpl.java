@@ -4,10 +4,12 @@ import com.konstantinoplebank.dao.mapper.BillMapper;
 import com.konstantinoplebank.entity.Bill;
 import org.apache.ibatis.session.SqlSession;
 import org.mybatis.spring.support.SqlSessionDaoSupport;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public class BillDaoImpl extends SqlSessionDaoSupport implements BillDao {
     @Override
     public Optional<Bill> findBillById(long id) {
@@ -37,11 +39,11 @@ public class BillDaoImpl extends SqlSessionDaoSupport implements BillDao {
     }
 
     @Override
-    public void updateBill(Bill bill) {
+    public void updateAmount(long billId, long amount) {
         try (SqlSession session = getSqlSession()) {
             session
                     .getMapper(BillMapper.class)
-                    .updateBill(bill);
+                    .updateAmount(billId, amount);
         }
     }
 }

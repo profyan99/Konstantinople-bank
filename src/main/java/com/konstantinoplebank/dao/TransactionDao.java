@@ -14,6 +14,4 @@ public interface TransactionDao{
     List<Transaction> findTransactionsByUserId(long id);
 
     void createTransaction(Transaction transaction);
-
-    void updateTransaction(Transaction transaction);
 }
