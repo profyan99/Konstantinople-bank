@@ -27,6 +27,10 @@ public interface UserService {
 
     void update(User user);
 
+    boolean existsById(Long id);
+
+    boolean existsByName(String name);
+
     void delete(User user);
 
     long create(UserProfile userProfile);

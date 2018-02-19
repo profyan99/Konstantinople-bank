@@ -14,9 +14,11 @@ public interface UserDao{
 
     void save(User user);
 
-    long create(User user);
+    User create(User user);
 
-    boolean exists(Long id);
+    boolean existsById(Long id);
+
+    boolean existsByName(String name);
 
     List<User> findAll();
 

@@ -56,9 +56,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    @Transactional
     public void createTransaction(long userid, long billid, long amount, String description) {
-        Bill bill = billService.findBillById(billid).orElseThrow(() -> new BillNotFoundException());
+        Bill bill = billService.findBillById(billid).orElseThrow(BillNotFoundException::new);
         Transaction transaction =
                 new Transaction(
                         bill.getUser(),

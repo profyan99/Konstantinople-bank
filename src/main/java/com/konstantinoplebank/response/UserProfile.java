@@ -2,7 +2,6 @@ package com.konstantinoplebank.response;
 
 import lombok.*;
 
-import javax.persistence.Embeddable;
 
 /**
  * Simple embeddable JavaBean object that uses as response to a queries

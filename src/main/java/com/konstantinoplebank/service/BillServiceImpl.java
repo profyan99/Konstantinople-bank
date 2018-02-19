@@ -40,7 +40,6 @@ public class BillServiceImpl implements BillService {
         User user = userService.getById(userid).orElseThrow(() -> new UsernameNotFoundException("id "+userid));
         Bill bill = new Bill(user, amount);
         billDao.createBill(bill);
-        //user.getBills().add(bill);
         return bill.getId();
     }
 
@@ -49,7 +48,6 @@ public class BillServiceImpl implements BillService {
         Bill currBill = transaction.getBill();
         if(currBill.getAmount() + transaction.getAmount() >= 0) {
             currBill.setAmount(currBill.getAmount() + transaction.getAmount());
-           // currBill.getTransactions().add(transaction);
             billDao.updateAmount(currBill.getId(), currBill.getAmount());
             //TODO transaction create without bill update or only bill update?
         }

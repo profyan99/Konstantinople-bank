@@ -14,18 +14,32 @@
         select * from user_roles WHERE user=#{id}
     </select>
 
-    <insert id="createRole">
+    <sql id="insertRole">
         INSERT INTO user_roles
-        <foreach collection="roles" item="role"  index="index"  separator="," >
-            (user, roles) VALUES (#{userid}, #{role})
+        <foreach collection="roles" item="role"  index="index">
+            (user, roles) VALUES (${userid}, #{role, typeHandler=org.apache.ibatis.type.EnumTypeHandler})
         </foreach>
+    </sql>
+
+    <sql id="updateRole">
+        UPDATE user_roles SET
+        <foreach collection="roles" item="role"  index="index"  separator="," >
+            roles=${role} WHERE user=${userid}
+        </foreach>
+    </sql>
+
+    <insert id="createRole">
+        <include refid="insertRole">
+            <property name="userid" value="#{userid}"/>
+            <property name="roles" value="#{roles}"/>
+        </include>
     </insert>
 
     <update id="updateRole">
-        UPDATE user_roles SET
-        <foreach collection="roles" item="role"  index="index"  separator="," >
-            roles=#{role} WHERE user=#{userid}
-        </foreach>
+        <include refid="updateRole">
+            <property name="userid" value="#{userid}"/>
+            <property name="roles" value="#{roles}"/>
+        </include>
     </update>
 
 </mapper>

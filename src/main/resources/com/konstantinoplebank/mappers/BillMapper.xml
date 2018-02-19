@@ -13,24 +13,24 @@
                     javaType="ArrayList"
                     ofType="com.konstantinoplebank.entity.Transaction"
                     select="com.konstantinoplebank.dao.mapper.Transaction.findTransactionById"
-                    fetchType="eager"
+                    fetchType="lazy"
         />
 
     </resultMap>
 
-    <select id="findBillById" parameterType="_long" resultType="Bill">
-        select * from bills WHERE id=#{id}
+    <select id="findBillById" parameterType="_long" resultMap="BillResult">
+        SELECT * FROM bills WHERE id=#{id}
     </select>
 
     <select id="findBillsByUserId" parameterType="_long" resultMap="BillResult">
-        select * from bills where user=#{studId}
+        SELECT * FROM bills WHERE user=#{id}
     </select>
     
     <insert id="createBill" parameterType="Bill" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
         INSERT INTO bills(amount, user) VALUES (#{amount}, #{user.id})
     </insert>
 
-    <update id="updateBill" parameterType="Bill">
+    <!--<update id="updateBill" parameterType="Bill">
         BEGIN
         UPDATE bills SET amount=#{amount} WHERE id=#{id}
         <foreach collection="transactions" item="trans"  index="index"  separator="," >
@@ -39,7 +39,7 @@
             </include>
         </foreach>;
         END;
-    </update>
+    </update>-->
 
     <update id="updateAmount">
         UPDATE bills SET amount=#{amount} WHERE id=#{billId}

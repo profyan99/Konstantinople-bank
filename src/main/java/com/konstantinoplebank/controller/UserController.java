@@ -43,16 +43,20 @@ public class UserController {
     @PostMapping(value = "/registration", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createUser(@RequestBody UserProfile user) throws Exception {
         ResponseEntity resp;
-        if(!userService.getByName(user.getName()).isPresent()) {
+        if(!userService.existsByName(user.getName())) {
             long id = userService.create(user);
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setLocation(ServletUriComponentsBuilder
-                    .fromCurrentRequest()
-                    .path("/{id}")
-                    .buildAndExpand(id)
-                    .toUri());
-            resp = new ResponseEntity<>(headers, HttpStatus.CREATED);
+            if(id == 0) {
+                resp = new ResponseEntity<>(new SimpleResponse("Server has some errors, while creating account"), HttpStatus.FORBIDDEN);
+            }
+            else {
+                HttpHeaders headers = new HttpHeaders();
+                headers.setLocation(ServletUriComponentsBuilder
+                        .fromCurrentRequest()
+                        .path("/{id}")
+                        .buildAndExpand(id)
+                        .toUri());
+                resp = new ResponseEntity<>(headers, HttpStatus.CREATED);
+            }
         }
         else {
             resp = new ResponseEntity<>(new SimpleResponse("Already registered"), HttpStatus.FORBIDDEN);

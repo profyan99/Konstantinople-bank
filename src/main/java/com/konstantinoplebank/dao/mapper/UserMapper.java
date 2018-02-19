@@ -13,7 +13,9 @@ public interface UserMapper {
 
     long create(User user);
 
-    boolean exists(Long id);
+    boolean existsById(Long id);
+
+    boolean existsByName(String name);
 
     List<User> findAll();
 

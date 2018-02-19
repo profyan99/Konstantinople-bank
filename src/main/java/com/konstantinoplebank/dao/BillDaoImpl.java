@@ -3,47 +3,86 @@ package com.konstantinoplebank.dao;
 import com.konstantinoplebank.dao.mapper.BillMapper;
 import com.konstantinoplebank.entity.Bill;
 import org.apache.ibatis.session.SqlSession;
-import org.mybatis.spring.support.SqlSessionDaoSupport;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class BillDaoImpl extends SqlSessionDaoSupport implements BillDao {
+public class BillDaoImpl implements BillDao {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    private final SqlSessionFactory sessionFactory;
+
+    @Autowired
+    public BillDaoImpl(@Qualifier("SimpleSqlFactory") SqlSessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
+
     @Override
     public Optional<Bill> findBillById(long id) {
-        try (SqlSession session = getSqlSession()) {
-            return Optional.of(session
+        Optional<Bill> bill = Optional.empty();
+        try (SqlSession session = sessionFactory.openSession()) {
+            bill = Optional.of(session
                     .getMapper(BillMapper.class)
                     .findBillById(id));
+            return bill;
+        } catch (RuntimeException e) {
+            logger.error("Couldn't findBillById: " + e.toString());
+            return bill;
         }
     }
 
     @Override
     public List<Bill> findBillsByUserId(long id) {
-        try (SqlSession session = getSqlSession()) {
-            return session
+        List<Bill> bill = Collections.emptyList();
+        try (SqlSession session = sessionFactory.openSession()) {
+            bill = session
                     .getMapper(BillMapper.class)
                     .findBillsByUserId(id);
+            return bill;
+        } catch (RuntimeException e) {
+            logger.error("Couldn't findBillsByUserId: " + e.toString());
+            return bill;
         }
     }
 
     @Override
     public void createBill(Bill bill) {
-        try (SqlSession session = getSqlSession()) {
+        SqlSession session = sessionFactory.openSession();
+        try {
             session
                     .getMapper(BillMapper.class)
                     .createBill(bill);
+            session.commit();
+        } catch (RuntimeException e) {
+            logger.error("Couldn't create bill: "+e.toString());
+            session.rollback();
+        } finally {
+            session.close();
         }
     }
 
     @Override
     public void updateAmount(long billId, long amount) {
-        try (SqlSession session = getSqlSession()) {
+        SqlSession session = sessionFactory.openSession();
+        try {
             session
                     .getMapper(BillMapper.class)
                     .updateAmount(billId, amount);
+            session.commit();
+        } catch (RuntimeException e) {
+            logger.error("Couldn't update bill amount: "+e.toString());
+            session.rollback();
+        } finally {
+            session.close();
         }
     }
 }

@@ -18,57 +18,57 @@
                     javaType="Collection"
                     ofType="Bill"
                     select="com.konstantinoplebank.mappers.BillMapper.findBillsByUserId"
-                    fetchType="eager"
+                    fetchType="lazy"
         />
         <collection property="roles"
                     column="user"
                     javaType="Collection"
                     ofType="Role"
                     select="com.konstantinoplebank.mappers.RoleMapper.findRoleByUserId"
-                    fetchType="eager"
+                    fetchType="lazy"
         />
     </resultMap>
 
-    <select id="findByName" parameterType="string" resultType="User">
+    <select id="findByName" parameterType="string" resultMap="UserResult">
         select * from bank.users WHERE name = #{name}
     </select>
 
-    <select id="findById" parameterType="_long" resultType="User">
+    <select id="findById" parameterType="_long" resultMap="UserResult">
         SELECT * from bank.users where id = #{id}
     </select>
 
+
     <insert id="create" parameterType="User" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
-        BEGIN
         INSERT INTO bank.users(address, age, description, email, name, password)
-        VALUES (#{address}, #{age}, #{description}, #{email}, #{name}, #{password})
-        <include refid="createRole">
-            <property name="roles" value="#{roles}"/>
+        VALUES (#{address}, #{age}, #{description}, #{email}, #{name}, #{password});
+        <!--INSERT INTO user_roles
+        <foreach collection="roles" item="role"  index="index">
+            (user) VALUES (#{id}), #{role, typeHandler=org.apache.ibatis.type.EnumTypeHandler})
+        </foreach>;-->
+        <!--<include refid="com.konstantinoplebank.dao.mapper.RoleMapper.insertRole">
+            <property name="roles" value="#{roles, typeHandler=org.apache.ibatis.type.EnumTypeHandler}"/>
             <property name="userid" value="#{id}"/>
-        </include>
-        end;
+        </include>;-->
     </insert>
 
     <update id="save" parameterType="User">
-        BEGIN
         UPDATE bank.users SET address = #{address}, age = #{age}, description = #{description},
-            email = #{email}, name = #{name}, password = #{password} WHERE id = #{id}
-        <foreach collection="bills" item="bill"  index="index"  separator="," >
-            <include refid="updateBill">
-                <property name="Bill" value="#{bill}"/>
-            </include>
-        </foreach>;
-        <include refid="updateRole">
+            email = #{email}, name = #{name}, password = #{password} WHERE id = #{id};
+        <!--<include refid="com.konstantinoplebank.dao.mapper.RoleMapper.insertRole">
             <property name="roles" value="#{roles}"/>
             <property name="userid" value="#{id}"/>
-        </include>
-        END;
+        </include>;-->
     </update>
 
-    <select id="exists" parameterType="_long" resultType="_boolean">
+    <select id="existsById" parameterType="_long" resultType="_boolean">
         SELECT EXISTS(SELECT 1 FROM bank.users WHERE id = #{id})
     </select>
+
+    <select id="existsByName" parameterType="string" resultType="_boolean">
+        SELECT EXISTS(SELECT 1 FROM bank.users WHERE name = #{name})
+    </select>
     
-    <select id="findAll" resultType="UserResult">
+    <select id="findAll" resultMap="UserResult">
         SELECT * FROM bank.users
     </select>
     

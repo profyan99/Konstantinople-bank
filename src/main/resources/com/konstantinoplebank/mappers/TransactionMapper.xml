@@ -14,17 +14,16 @@
                      column="bill"
                      javaType="com.konstantinoplebank.entity.Bill"
                      select="com.konstantinoplebank.dao.mapper.BillMapper.findBillById"
-                     fetchType="eager"
+                     fetchType="lazy"
         />
-
     </resultMap>
 
-    <select id="findTransactionById" parameterType="_long" resultType="Transaction">
+    <select id="findTransactionById" parameterType="_long" resultMap="TransactionResult">
         select * from transactions WHERE id=#{id}
     </select>
 
     <select id="findTransactionsByUserId" parameterType="_long" resultMap="TransactionResult">
-        select * from transactions where user=#{studId}
+        select * from transactions where user=#{id}
     </select>
 
     <insert id="createTransaction"  parameterType="Transaction" useGeneratedKeys="true" keyColumn="id" keyProperty="id">

@@ -84,8 +84,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         configuration.setAllowedOrigins(
                 Arrays.asList(
                         "http://localhost:8080",
-                        "http://localhost:8088",
-                        "http://localhost:8088/login")
+                        "http://localhost:8080/login")
         );
         configuration.setAllowedMethods(Arrays.asList("GET","POST"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

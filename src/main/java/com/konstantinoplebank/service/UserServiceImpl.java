@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -77,7 +78,13 @@ public class UserServiceImpl implements UserService {
                 userProfile.getAge(),
                 new HashSet<>(Collections.singletonList(Role.USER)));
 
-        userDao.create(user);
+        try {
+            userDao.create(user);
+        } catch (RuntimeException e) {
+            logger.error("Ebal ------------------------");
+        }
+        
+
         return user.getId();
     }
     @Override
@@ -98,5 +105,15 @@ public class UserServiceImpl implements UserService {
     public UserProfile getUserProfile(long id) {
         return userDao.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("id: "+id));
+    }
+
+    @Override
+    public boolean existsById(Long id) {
+        return userDao.existsById(id);
+    }
+
+    @Override
+    public boolean existsByName(String name) {
+        return userDao.existsByName(name);
     }
 }
