@@ -1,5 +1,6 @@
-package com.konstantinoplebank.dao;
+package com.konstantinoplebank.dao.implementation;
 
+import com.konstantinoplebank.dao.TransactionDao;
 import com.konstantinoplebank.dao.mapper.TransactionMapper;
 import com.konstantinoplebank.dao.mapper.UserMapper;
 import com.konstantinoplebank.entity.Transaction;
@@ -65,10 +66,37 @@ public class TransactionDaoImpl implements TransactionDao {
                     .createTransaction(transaction);
             session.commit();
         } catch (RuntimeException e) {
-            logger.error("Couldn't createTransaction: "+e.toString());
+            logger.error("Couldn't create: "+e.toString());
             session.rollback();
         } finally {
             session.close();
+        }
+    }
+
+    @Override
+    public List<Transaction> findTransactionsByUserName(String name) {
+        List<Transaction> transactions = Collections.emptyList();
+        try (SqlSession session = sessionFactory.openSession()) {
+            transactions = session
+                    .getMapper(TransactionMapper.class)
+                    .findTransactionsByUserName(name);
+            return transactions;
+        } catch (RuntimeException e) {
+            logger.error("Couldn't findTransactionsByUserName: " + e.toString());
+            return transactions;
+        }
+    }
+    @Override
+    public List<Transaction> findTransactionsByBillId(long id) {
+        List<Transaction> transactions = Collections.emptyList();
+        try (SqlSession session = sessionFactory.openSession()) {
+            transactions = session
+                    .getMapper(TransactionMapper.class)
+                    .findTransactionsByBillId(id);
+            return transactions;
+        } catch (RuntimeException e) {
+            logger.error("Couldn't findTransactionsByUserName: " + e.toString());
+            return transactions;
         }
     }
 }

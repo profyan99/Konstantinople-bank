@@ -26,12 +26,9 @@ public class BillController {
 
     private final BillService billService;
 
-    private final UserService userService;
-
     @Autowired
-    public BillController(BillService service, UserService userService) {
+    public BillController(BillService service) {
         this.billService = service;
-        this.userService = userService;
     }
 
 
@@ -41,29 +38,29 @@ public class BillController {
 
         // checking, that user create bill in his account
         if(principal.getName().equals(bill.getUserName())) {
-            billService.createBill(bill.getUserid(), bill.getAmount());
+            billService.create(bill.getUserid(), bill.getAmount());
             resp = new ResponseEntity<>(HttpStatus.OK);
         }
         else {
             resp = new ResponseEntity<>(
-                    new SimpleResponse("You don't have permissions to create bill in foreign account"), HttpStatus.FORBIDDEN);
+                    new SimpleResponse("You don't have permissions to create bill in foreign account"),
+                    HttpStatus.FORBIDDEN
+            );
         }
         return resp;
     }
 
     @GetMapping
     public ResponseEntity<?> getUserBills(Principal principal) {
-        User user = userService.getByName(principal.getName()).orElseThrow(
-                () -> new UsernameNotFoundException(principal.getName()));
         List<UserBill> bills = new ArrayList<>();
-        billService.findBillsByUserId(user.getId()).forEach(
+        billService.findByUserName(principal.getName()).forEach(
                 (e) -> bills.add(new UserBill(e.getId(), e.getTransactions(), e.getAmount())));
         return new ResponseEntity<>(bills, HttpStatus.OK);
     }
 
     @GetMapping(path = "/{trId}")
     public ResponseEntity<?> getBill(@PathVariable("trId") long id) {
-        Bill bill = billService.findBillById(id).orElseThrow(() -> new BillNotFoundException());
+        Bill bill = billService.findById(id).orElseThrow(BillNotFoundException::new);
         return new ResponseEntity<>(new UserBill(bill.getId(),bill.getTransactions(), bill.getAmount()), HttpStatus.OK);
     }
 

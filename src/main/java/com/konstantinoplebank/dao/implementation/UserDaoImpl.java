@@ -1,11 +1,11 @@
-package com.konstantinoplebank.dao;
+package com.konstantinoplebank.dao.implementation;
 
+import com.konstantinoplebank.dao.UserDao;
 import com.konstantinoplebank.dao.mapper.RoleMapper;
 import com.konstantinoplebank.dao.mapper.UserMapper;
 import com.konstantinoplebank.entity.User;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.mybatis.spring.support.SqlSessionDaoSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,14 +47,14 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void save(User user) {
+    public void update(User user) {
         SqlSession session = sessionFactory.openSession();
         try {
             session.getMapper(UserMapper.class).save(user);
             session.getMapper(RoleMapper.class).updateRole(new ArrayList<>(user.getRoles()), user.getId());
             session.commit();
         } catch (RuntimeException e) {
-            logger.error("Couldn't save user: "+e.toString());
+            logger.error("Couldn't update user: "+e.toString());
             session.rollback();
         } finally {
             session.close();

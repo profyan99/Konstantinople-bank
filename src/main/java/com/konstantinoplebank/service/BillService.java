@@ -7,11 +7,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BillService {
-    Optional<Bill> findBillById(long id);
+    Optional<Bill> findById(long id);
 
-    List<Bill> findBillsByUserId(long id);
+    List<Bill> findByUserId(long id);
 
-    long createBill(long userid, long amount);
+    List<Bill> findByUserName(String name);
+
+    long create(long userId, long amount);
 
     void applyTransaction(Transaction transaction);
 

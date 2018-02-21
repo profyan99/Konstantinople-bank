@@ -1,4 +1,4 @@
-package com.konstantinoplebank.service;
+package com.konstantinoplebank.service.implementation;
 
 import com.konstantinoplebank.entity.User;
 import com.konstantinoplebank.dao.UserDao;
@@ -6,13 +6,15 @@ import com.konstantinoplebank.entity.Bill;
 import com.konstantinoplebank.entity.Role;
 import com.konstantinoplebank.entity.Transaction;
 import com.konstantinoplebank.response.UserProfile;
+import com.konstantinoplebank.service.BillService;
+import com.konstantinoplebank.service.TransactionService;
+import com.konstantinoplebank.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -29,23 +31,25 @@ public class UserServiceImpl implements UserService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final UserDao userDao;
+    private final BillService billService;
+    private final TransactionService transactionService;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao) {
+    public UserServiceImpl(UserDao userDao, BillService billService, TransactionService transactionService) {
         this.userDao = userDao;
+        this.billService = billService;
+        this.transactionService = transactionService;
     }
 
     @Override
     public long save(User user) throws Exception {
-        userDao.save(user);
+        userDao.update(user);
         return user.getId();
     }
 
     @Override
     public List<UserProfile> findAll() {
-        List<UserProfile> list = new ArrayList<>();
-        list.addAll(userDao.findAll());
-        return list;
+        return new ArrayList<>(userDao.findAll());
     }
 
     @Override
@@ -59,7 +63,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void update(User user) {
+    public void update(UserProfile user) {
+        userDao.update(new User(
+                user.getName(),
+                user.getEmail(),
+                user.getPassword(),
+                user.getDescription(),
+                user.getAddress(),
+                user.getAge(),
+                user.getRoles()));
     }
 
     @Override
@@ -78,27 +90,17 @@ public class UserServiceImpl implements UserService {
                 userProfile.getAge(),
                 new HashSet<>(Collections.singletonList(Role.USER)));
 
-        try {
-            userDao.create(user);
-        } catch (RuntimeException e) {
-            logger.error("Ebal ------------------------");
-        }
-        
-
+        userDao.create(user);
         return user.getId();
     }
     @Override
     public Set<Bill> getUserBills(long id) {
-        return userDao.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("id: "+id))
-                .getBills();
+        return new HashSet<>(billService.findByUserId(id));
     }
 
     @Override
     public Set<Transaction> getUserTransactions(long id) {
-        return /*userDao.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("id: "+id))
-                .getTransactions();*/ null;
+        return new HashSet<>(transactionService.findByUserId(id));
     }
 
     @Override

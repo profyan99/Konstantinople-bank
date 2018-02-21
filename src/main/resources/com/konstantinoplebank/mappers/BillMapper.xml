@@ -25,6 +25,10 @@
     <select id="findBillsByUserId" parameterType="_long" resultMap="BillResult">
         SELECT * FROM bills WHERE user=#{id}
     </select>
+
+    <select id="findBillsByUserName" parameterType="string" resultMap="BillResult">
+        SELECT * FROM bills WHERE user IN (SELECT id FROM bank.users WHERE name=#{name})
+    </select>
     
     <insert id="createBill" parameterType="Bill" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
         INSERT INTO bills(amount, user) VALUES (#{amount}, #{user.id})

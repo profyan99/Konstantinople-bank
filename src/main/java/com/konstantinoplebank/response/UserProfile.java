@@ -1,6 +1,9 @@
 package com.konstantinoplebank.response;
 
+import com.konstantinoplebank.entity.Role;
 import lombok.*;
+
+import java.util.Set;
 
 
 /**
@@ -23,5 +26,6 @@ public class UserProfile {
     private String description;
     private String address;
     private int age;
+    private Set<Role> roles;
 
 }

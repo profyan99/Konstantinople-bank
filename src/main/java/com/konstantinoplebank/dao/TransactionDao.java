@@ -13,5 +13,9 @@ public interface TransactionDao{
 
     List<Transaction> findTransactionsByUserId(long id);
 
+    List<Transaction> findTransactionsByBillId(long id);
+
+    List<Transaction> findTransactionsByUserName(String name);
+
     void createTransaction(Transaction transaction);
 }

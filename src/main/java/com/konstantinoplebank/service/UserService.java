@@ -25,7 +25,7 @@ public interface UserService {
 
     Optional<User> getByName(String name);
 
-    void update(User user);
+    void update(UserProfile user);
 
     boolean existsById(Long id);
 

@@ -10,10 +10,9 @@ public interface BillMapper {
 
     List<Bill> findBillsByUserId(long id);
 
-    void createBill(Bill bill);
+    List<Bill> findBillsByUserName(String name);
 
-    //TODO i need update bill?
-    void updateBill(Bill bill);
+    void createBill(Bill bill);
 
     void updateAmount(@Param("billId") long billId, @Param("amount") long amount);
 }

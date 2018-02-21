@@ -12,7 +12,9 @@ public interface UserDao{
 
     Optional<User> findByName(String name);
 
-    void save(User user);
+    Optional<User> findById(long id);
+
+    void update(User user);
 
     User create(User user);
 
@@ -29,7 +31,5 @@ public interface UserDao{
     void deleteByName(String name);
 
     void deleteAll();
-
-    Optional<User> findById(long id);
 
 }

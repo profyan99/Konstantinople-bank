@@ -1,4 +1,4 @@
-package com.konstantinoplebank.service;
+package com.konstantinoplebank.service.implementation;
 
 import com.konstantinoplebank.dao.UserDao;
 import com.konstantinoplebank.entity.Role;
@@ -43,10 +43,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = userDao.findByName(s).orElseThrow(() -> new UsernameNotFoundException(s));
 
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
+        user.getRoles().forEach((role -> grantedAuthorities.add(new SimpleGrantedAuthority(role.getAuthority()))));
 
-        for (Role role : user.getRoles()) {
-            grantedAuthorities.add(new SimpleGrantedAuthority(role.getAuthority()));
-        }
         return new org.springframework.security.core.userdetails.User(user.getName(),
                 user.getPassword(), grantedAuthorities);
     }

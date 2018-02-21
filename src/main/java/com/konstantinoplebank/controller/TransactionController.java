@@ -35,7 +35,7 @@ public class TransactionController {
 
         // checking, that user create bill in his account
         if(principal.getName().equals(transaction.getUserName())) {
-            transactionService.createTransaction(
+            transactionService.create(
                     transaction.getUserid(),
                     transaction.getBillid(),
                     transaction.getAmount(),
@@ -50,19 +50,14 @@ public class TransactionController {
         return resp;
     }
 
-    @GetMapping(path = "/all")
-    public ResponseEntity<?> allTransactions() {
-        return new ResponseEntity<>(transactionService.getAllTransactions(), null, HttpStatus.OK);
-    }
-
     @GetMapping(path = "/{trId}")
     public ResponseEntity<?> transactionInformation(@PathVariable("trId") long id) {
-        return new ResponseEntity<>(transactionService.getTransactionById(id), null, HttpStatus.OK);
+        return new ResponseEntity<>(transactionService.findById(id), null, HttpStatus.OK);
     }
 
     @GetMapping(path = "/{userName}")
     public ResponseEntity<?> userTransactions(@PathVariable("userName") String name) {
-        return new ResponseEntity<>(transactionService.getAllTransactionsByUserName(name), null, HttpStatus.OK);
+        return new ResponseEntity<>(transactionService.findByUserName(name), null, HttpStatus.OK);
     }
 
 }

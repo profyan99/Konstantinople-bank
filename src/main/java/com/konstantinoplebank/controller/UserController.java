@@ -1,12 +1,9 @@
 package com.konstantinoplebank.controller;
 
-import com.konstantinoplebank.entity.Bill;
 import com.konstantinoplebank.entity.User;
 import com.konstantinoplebank.response.SimpleResponse;
 import com.konstantinoplebank.response.UserProfile;
 import com.konstantinoplebank.service.UserService;
-import com.konstantinoplebank.service.UserServiceImpl;
-import com.konstantinoplebank.entity.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * Controller, which handle queries of {@link User}
@@ -75,7 +69,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/user/{id}/transactions")
-    public ResponseEntity<?> userTransactions(@PathVariable("id") long id) {
+    public ResponseEntity<?> userAllTransactions(@PathVariable("id") long id) {
         return new ResponseEntity<>(userService.getUserTransactions(id), HttpStatus.OK);
     }
 

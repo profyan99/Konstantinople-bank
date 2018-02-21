@@ -1,9 +1,11 @@
-package com.konstantinoplebank.service;
+package com.konstantinoplebank.service.implementation;
 
 import com.konstantinoplebank.dao.BillDao;
 import com.konstantinoplebank.entity.Bill;
 import com.konstantinoplebank.entity.Transaction;
 import com.konstantinoplebank.entity.User;
+import com.konstantinoplebank.service.BillService;
+import com.konstantinoplebank.service.UserService;
 import com.konstantinoplebank.utils.exception.InvalidTransaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -26,17 +28,17 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public Optional<Bill> findBillById(long id) {
+    public Optional<Bill> findById(long id) {
         return billDao.findBillById(id);
     }
 
     @Override
-    public List<Bill> findBillsByUserId(long id) {
+    public List<Bill> findByUserId(long id) {
         return billDao.findBillsByUserId(id);
     }
 
     @Override
-    public long createBill(long userid, long amount) {
+    public long create(long userid, long amount) {
         User user = userService.getById(userid).orElseThrow(() -> new UsernameNotFoundException("id "+userid));
         Bill bill = new Bill(user, amount);
         billDao.createBill(bill);
@@ -54,6 +56,11 @@ public class BillServiceImpl implements BillService {
         else {
             throw new InvalidTransaction("Less than zero");
         }
+    }
+
+    @Override
+    public List<Bill> findByUserName(String name) {
+        return billDao.findBillsByUserName(name);
     }
 
     @Override

@@ -1,5 +1,6 @@
-package com.konstantinoplebank.dao;
+package com.konstantinoplebank.dao.implementation;
 
+import com.konstantinoplebank.dao.BillDao;
 import com.konstantinoplebank.dao.mapper.BillMapper;
 import com.konstantinoplebank.entity.Bill;
 import org.apache.ibatis.session.SqlSession;
@@ -35,7 +36,7 @@ public class BillDaoImpl implements BillDao {
                     .findBillById(id));
             return bill;
         } catch (RuntimeException e) {
-            logger.error("Couldn't findBillById: " + e.toString());
+            logger.error("Couldn't findById: " + e.toString());
             return bill;
         }
     }
@@ -49,7 +50,7 @@ public class BillDaoImpl implements BillDao {
                     .findBillsByUserId(id);
             return bill;
         } catch (RuntimeException e) {
-            logger.error("Couldn't findBillsByUserId: " + e.toString());
+            logger.error("Couldn't findByUserId: " + e.toString());
             return bill;
         }
     }
@@ -83,6 +84,20 @@ public class BillDaoImpl implements BillDao {
             session.rollback();
         } finally {
             session.close();
+        }
+    }
+
+    @Override
+    public List<Bill> findBillsByUserName(String name) {
+        List<Bill> bill = Collections.emptyList();
+        try (SqlSession session = sessionFactory.openSession()) {
+            bill = session
+                    .getMapper(BillMapper.class)
+                    .findBillsByUserName(name);
+            return bill;
+        } catch (RuntimeException e) {
+            logger.error("Couldn't findByUserName: " + e.toString());
+            return bill;
         }
     }
 }

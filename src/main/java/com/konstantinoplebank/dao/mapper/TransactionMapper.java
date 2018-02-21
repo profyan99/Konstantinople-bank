@@ -11,4 +11,8 @@ public interface TransactionMapper {
     List<Transaction> findTransactionsByUserId(long id);
 
     void createTransaction(Transaction transaction);
+
+    List<Transaction> findTransactionsByBillId(long id);
+
+    List<Transaction> findTransactionsByUserName(String name);
 }

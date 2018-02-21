@@ -19,6 +19,7 @@ import java.util.Set;
 @ToString
 public class User extends UserProfile {
 
+    //TODO refactor in OOP rules
     private long id;
 
     private String name;
@@ -33,15 +34,15 @@ public class User extends UserProfile {
 
     private int age;
 
-    private Set<Bill> bills = new HashSet<>();
+    private Set<Bill> bills;
 
-    private Set<Role> roles = new HashSet<>();
+    private Set<Role> roles;
 
     private String confirmPassword;
 
     public User(String name, String email, String password, String description, String address, int age,
                 Set<Role> roles) {
-        super(name, email, password, description, address, age);
+        super(name, email, password, description, address, age, roles);
         this.name = name;
         this.email = email;
         this.password = password;
@@ -49,10 +50,24 @@ public class User extends UserProfile {
         this.address = address;
         this.age = age;
         this.roles.addAll(roles);
+        this.bills = new HashSet<>();
+    }
+
+    public User(String name, String email, String password, String description, String address, int age, long id) {
+        super(name, email, password, description, address, age, new HashSet<>());
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.description = description;
+        this.address = address;
+        this.age = age;
+        this.bills = new HashSet<>();
+        this.roles = new HashSet<>();
     }
 
     public User() {
-
+        super();
     }
 
     public long getId() {

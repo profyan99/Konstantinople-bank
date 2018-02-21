@@ -12,6 +12,8 @@ public interface BillDao {
 
     List<Bill> findBillsByUserId(long id);
 
+    List<Bill> findBillsByUserName(String name);
+
     void createBill(Bill bill);
 
     void updateAmount(long billId, long amount);

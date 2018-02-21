@@ -12,12 +12,14 @@ import java.util.List;
  */
 
 public interface TransactionService {
-    List<Transaction> getAllTransactions();
+    Transaction findById(long id);
 
-    Transaction getTransactionById(long id);
+    List<Transaction> findByUserName(String name);
 
-    List<Transaction> getAllTransactionsByUserName(String name);
+    List<Transaction> findByUserId(long id);
 
-    void createTransaction(long userid, long billid, long amount, String description);
+    List<Transaction> findByBillId(long id);
+
+    long create(long userId, long billId, long amount, String description);
 
 }
