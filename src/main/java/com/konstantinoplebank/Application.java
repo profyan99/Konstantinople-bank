@@ -20,7 +20,6 @@ import java.io.InputStream;
 
 @SpringBootApplication
 @Import(DataBaseConfig.class)
-@EnableTransactionManagement
 public class Application {
 
     private final DataBaseConfig dataBaseConfig;
@@ -35,7 +34,7 @@ public class Application {
 
     }
 
-    @Bean
+    @Bean(name = "SimpleDataSource")
     public DataSource mysqlDataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(dataBaseConfig.getDriver());
@@ -57,12 +56,6 @@ public class Application {
     public SqlSessionTemplate sqlSession() throws Exception {
         return new SqlSessionTemplate(mysqlSessionFactory());
     }
-
-    @Bean("transactionManager")
-    public DataSourceTransactionManager dataSourceTransactionManager() {
-        return new DataSourceTransactionManager(mysqlDataSource());
-    }
-
 
     @Bean(initMethod = "migrate", name = "flyway")
     public Flyway flyway() {

@@ -6,20 +6,25 @@ import com.konstantinoplebank.security.SecurityAuthenticationFailureHandler;
 import com.konstantinoplebank.security.SecurityAuthenticationSuccessHandler;
 import com.konstantinoplebank.service.implementation.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import javax.sql.DataSource;
 import java.util.Arrays;
 
 /**
@@ -31,6 +36,10 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebMvc
+@EnableGlobalMethodSecurity(
+        prePostEnabled = true,
+        securedEnabled = true,
+        jsr250Enabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final SecurityAuthenticationEntryPoint authenticationEntryPoint;
@@ -43,34 +52,62 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userService;
 
+    private final DataSource dataSource;
+
     @Autowired
-    public SecurityConfig(UserDetailsServiceImpl userService, SecurityAuthenticationEntryPoint authenticationEntryPoint, SecurityAuthenticationFailureHandler authenticationFailureHandler, SecurityAuthenticationSuccessHandler authenticationSuccessHandler, SecurityLogoutSuccessHandler logoutSuccessHandler) {
+    public SecurityConfig(UserDetailsServiceImpl userService,
+                          SecurityAuthenticationEntryPoint authenticationEntryPoint,
+                          SecurityAuthenticationFailureHandler authenticationFailureHandler,
+                          SecurityAuthenticationSuccessHandler authenticationSuccessHandler,
+                          SecurityLogoutSuccessHandler logoutSuccessHandler,
+                          @Qualifier("SimpleDataSource") DataSource dataSource) {
         this.userService = userService;
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.authenticationFailureHandler = authenticationFailureHandler;
         this.authenticationSuccessHandler = authenticationSuccessHandler;
         this.logoutSuccessHandler = logoutSuccessHandler;
+        this.dataSource = dataSource;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .cors()
-                .and()
+            .and()
                 .authorizeRequests()
-                .antMatchers("/", "/registration", "/home").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .formLogin().permitAll()
-                .and()
-                .logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).permitAll();
+                .antMatchers("/", "/registration", "/home")
+                .permitAll()
+                .anyRequest()
+                .authenticated()
+            .and()
+                .formLogin()
+                .successHandler(authenticationSuccessHandler)
+                .failureHandler(authenticationFailureHandler)
+                .permitAll()
+            .and()
+                .logout()
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                .logoutSuccessHandler(logoutSuccessHandler)
+                .deleteCookies("JSESSIONID")
+                .permitAll()
+            .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(authenticationEntryPoint)
+            .and()
+                .rememberMe()
+                .tokenRepository(persistentTokenRepository())
+                .rememberMeParameter("remember-me")
+                .tokenValiditySeconds(60*24*14)
+                .userDetailsService(userService)
+            .and()
+                .csrf().disable();
 
-        http.csrf().disable();
-        http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint);
-        http.formLogin().successHandler(authenticationSuccessHandler);
-        http.formLogin().failureHandler(authenticationFailureHandler);
-        http.logout().logoutSuccessHandler(logoutSuccessHandler);
+    }
 
+    private PersistentTokenRepository persistentTokenRepository() {
+                JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
+                tokenRepository.setDataSource(dataSource);
+                return tokenRepository;
     }
 
     @Bean

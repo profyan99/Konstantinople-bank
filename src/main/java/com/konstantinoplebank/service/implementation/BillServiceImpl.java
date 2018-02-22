@@ -51,7 +51,6 @@ public class BillServiceImpl implements BillService {
         if(currBill.getAmount() + transaction.getAmount() >= 0) {
             currBill.setAmount(currBill.getAmount() + transaction.getAmount());
             billDao.updateAmount(currBill.getId(), currBill.getAmount());
-            //TODO transaction create without bill update or only bill update?
         }
         else {
             throw new InvalidTransaction("Less than zero");
@@ -66,5 +65,10 @@ public class BillServiceImpl implements BillService {
     @Override
     public void updateAmount(long billId, long amount) {
         billDao.updateAmount(billId, amount);
+    }
+
+    @Override
+    public List<Bill> findAll() {
+        return billDao.findAll();
     }
 }

@@ -12,6 +12,8 @@ public interface BillMapper {
 
     List<Bill> findBillsByUserName(String name);
 
+    List<Bill> findAll();
+
     void createBill(Bill bill);
 
     void updateAmount(@Param("billId") long billId, @Param("amount") long amount);

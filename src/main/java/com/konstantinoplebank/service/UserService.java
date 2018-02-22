@@ -17,8 +17,6 @@ import java.util.Set;
  */
 
 public interface UserService {
-    long save(User user) throws Exception;
-
     List<UserProfile> findAll();
 
     Optional<User> getById(long id);
@@ -26,6 +24,14 @@ public interface UserService {
     Optional<User> getByName(String name);
 
     void update(UserProfile user);
+
+    void createBill(long userId, long amount);
+
+    Optional<Bill> getBill(long billiId);
+
+    void createTransaction(long amount, String description, long billId, long userId);
+
+    Optional<Transaction> getTransaction(long trId);
 
     boolean existsById(Long id);
 

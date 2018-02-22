@@ -13,6 +13,8 @@ public interface BillService {
 
     List<Bill> findByUserName(String name);
 
+    List<Bill> findAll();
+
     long create(long userId, long amount);
 
     void applyTransaction(Transaction transaction);

@@ -100,4 +100,18 @@ public class BillDaoImpl implements BillDao {
             return bill;
         }
     }
+
+    @Override
+    public List<Bill> findAll() {
+        List<Bill> bill = Collections.emptyList();
+        try (SqlSession session = sessionFactory.openSession()) {
+            bill = session
+                    .getMapper(BillMapper.class)
+                    .findAll();
+            return bill;
+        } catch (RuntimeException e) {
+            logger.error("Couldn't find all bills: " + e.toString());
+            return bill;
+        }
+    }
 }

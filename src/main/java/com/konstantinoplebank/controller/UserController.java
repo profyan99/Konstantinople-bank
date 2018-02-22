@@ -1,6 +1,10 @@
 package com.konstantinoplebank.controller;
 
+import com.konstantinoplebank.entity.Bill;
+import com.konstantinoplebank.entity.Transaction;
 import com.konstantinoplebank.entity.User;
+import com.konstantinoplebank.request.CreateBill;
+import com.konstantinoplebank.request.CreateTransaction;
 import com.konstantinoplebank.response.SimpleResponse;
 import com.konstantinoplebank.response.UserProfile;
 import com.konstantinoplebank.service.UserService;
@@ -11,8 +15,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Controller, which handle queries of {@link User}
@@ -27,7 +35,6 @@ public class UserController {
     private final UserService userService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
 
     @Autowired
     public UserController(UserService userService) {
@@ -58,19 +65,88 @@ public class UserController {
         return resp;
     }
 
+
     @GetMapping(value = "/user/{id}")
-    public ResponseEntity<?> userProfile(@PathVariable("id") long id) {
-        return new ResponseEntity<>(userService.getUserProfile(id), HttpStatus.OK);
+    @PreAuthorize("hasRole('ROLE_ADMIN') or #userId == @userService.getByName(principal.getUsername()).get().getName()")
+    public ResponseEntity<?> userProfile(@PathVariable("id") long userId) {
+        return new ResponseEntity<>(userService.getUserProfile(userId), HttpStatus.OK);
     }
 
     @GetMapping(value = "/user/{id}/bills")
-    public ResponseEntity<?> userBills(@PathVariable("id") long id) {
-        return new ResponseEntity<>(userService.getUserBills(id), HttpStatus.OK);
+    @PreAuthorize("hasRole('ROLE_ADMIN') or #userId == @userService.getByName(principal.getUsername()).get().getName()")
+    public ResponseEntity<?> allUserBills(@PathVariable("id") long userId) {
+        ResponseEntity resp;
+        Set<Bill> bills = userService.getUserBills(userId);
+        if(!bills.isEmpty()) {
+            resp = new ResponseEntity<>(bills, HttpStatus.OK);
+        }
+        else
+        {
+            resp = new ResponseEntity<>(new SimpleResponse("No bills found"), HttpStatus.NOT_FOUND);
+        }
+        return resp;
     }
 
-    @GetMapping(value = "/user/{id}/transactions")
-    public ResponseEntity<?> userAllTransactions(@PathVariable("id") long id) {
-        return new ResponseEntity<>(userService.getUserTransactions(id), HttpStatus.OK);
+    @PostMapping(value = "/user/{id}/bills", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN') or #userId == @userService.getByName(principal.getUsername()).get().getName()")
+    public ResponseEntity<?> createUserBill(@PathVariable("userId") long userId, @RequestBody CreateBill bill) {
+        userService.createBill(userId, bill.getAmount());
+        //TODO exceptions
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/user/{id}/bills/{billId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or #userId == @userService.getByName(principal.getUsername()).get().getName()")
+    public ResponseEntity<?> userBill(@PathVariable("id") long userId, @PathVariable("billId") long billId) {
+        ResponseEntity resp;
+        Optional<Bill> bill = userService.getBill(billId);
+        if(!bill.isPresent()) {
+            resp = new ResponseEntity<>(bill.orElse(null), HttpStatus.OK);
+        }
+        else
+        {
+            resp = new ResponseEntity<>(new SimpleResponse("No bill with id: "+billId+" found"), HttpStatus.NOT_FOUND);
+        }
+        return resp;
+    }
+
+
+    @GetMapping(value = "/user/{id}/bills/{billId}/transactions")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or #userId == @userService.getByName(principal.getUsername()).get().getName()")
+    public ResponseEntity<?> userAllTransactions(@PathVariable("id") long userId) {
+        ResponseEntity resp;
+        Set<Transaction> transactions = userService.getUserTransactions(userId);
+        if(!transactions.isEmpty()) {
+            resp = new ResponseEntity<>(transactions, HttpStatus.OK);
+        }
+        else
+        {
+            resp = new ResponseEntity<>(new SimpleResponse("No transactions found"), HttpStatus.NOT_FOUND);
+        }
+        return resp;
+    }
+
+    @PostMapping(value = "/user/{id}/bills/{billId}/transactions", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN') or #userId == @userService.getByName(principal.getUsername()).get().getName()")
+    public ResponseEntity<?> createUserTransaction(@PathVariable("id") long userId, @RequestBody CreateTransaction transaction) {
+        userService.createTransaction(transaction.getAmount(),transaction.getDescription(), transaction.getBillid(), userId);
+        //TODO exceptions
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/user/{id}/bills/{billId}/transactions/{trId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or #userId == @userService.getByName(principal.getUsername()).get().getName()")
+    public ResponseEntity<?> userTransaction(@PathVariable("id") long userId, @PathVariable("trId") long trId) {
+        ResponseEntity resp;
+        Optional<Transaction> transaction = userService.getTransaction(trId);
+        if(!transaction.isPresent()) {
+            resp = new ResponseEntity<>(transaction.orElse(null), HttpStatus.OK);
+        }
+        else
+        {
+            resp = new ResponseEntity<>(new SimpleResponse("No transaction with id: "+trId+" found"), HttpStatus.NOT_FOUND);
+        }
+        return resp;
     }
 
     @GetMapping(value = "/user/userlist")

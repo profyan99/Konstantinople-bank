@@ -3,6 +3,7 @@ package com.konstantinoplebank.service;
 import com.konstantinoplebank.entity.Transaction;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service class for {@link Transaction}
@@ -12,13 +13,15 @@ import java.util.List;
  */
 
 public interface TransactionService {
-    Transaction findById(long id);
+    Optional<Transaction> findById(long id);
 
     List<Transaction> findByUserName(String name);
 
     List<Transaction> findByUserId(long id);
 
     List<Transaction> findByBillId(long id);
+
+    List<Transaction> findAll();
 
     long create(long userId, long billId, long amount, String description);
 

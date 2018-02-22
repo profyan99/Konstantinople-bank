@@ -99,4 +99,18 @@ public class TransactionDaoImpl implements TransactionDao {
             return transactions;
         }
     }
+
+    @Override
+    public List<Transaction> findAll() {
+        List<Transaction> transactions = Collections.emptyList();
+        try (SqlSession session = sessionFactory.openSession()) {
+            transactions = session
+                    .getMapper(TransactionMapper.class)
+                    .findAll();
+            return transactions;
+        } catch (RuntimeException e) {
+            logger.error("Couldn't find all transactions: " + e.toString());
+            return transactions;
+        }
+    }
 }

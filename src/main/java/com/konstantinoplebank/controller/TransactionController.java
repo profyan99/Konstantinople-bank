@@ -1,18 +1,18 @@
 package com.konstantinoplebank.controller;
 
 import com.konstantinoplebank.entity.Transaction;
-import com.konstantinoplebank.request.CreateTransaction;
-import com.konstantinoplebank.response.SimpleResponse;
 import com.konstantinoplebank.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Controller, which handle queries of {@link Transaction}
+ * Controller, which handle queries of {@link Transaction} only for {@link com.konstantinoplebank.entity.Role} ADMIN
  *
  * @author Konstantin Artushkevich
  * @version 1.0
@@ -20,6 +20,7 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping(value = "/transactions")
+@PreAuthorize("hasRole('ROLE_ADMIN')")
 public class TransactionController {
 
     private final TransactionService transactionService;
@@ -29,35 +30,35 @@ public class TransactionController {
         this.transactionService = service;
     }
 
-    @PostMapping
-    public ResponseEntity<?> createTransaction(@RequestBody CreateTransaction transaction, Principal principal) {
-        ResponseEntity resp;
-
-        // checking, that user create bill in his account
-        if(principal.getName().equals(transaction.getUserName())) {
-            transactionService.create(
-                    transaction.getUserid(),
-                    transaction.getBillid(),
-                    transaction.getAmount(),
-                    transaction.getDescription()
-            );
-            resp = new ResponseEntity<>(HttpStatus.OK);
-        }
-        else {
-            resp = new ResponseEntity<>(
-                    new SimpleResponse("You don't have permissions to create transaction in foreign account"), HttpStatus.FORBIDDEN);
-        }
-        return resp;
+    @GetMapping
+    public ResponseEntity<?> allTransactions() {
+        return new ResponseEntity<>(transactionService.findAll(), HttpStatus.OK);
     }
 
-    @GetMapping(path = "/{trId}")
-    public ResponseEntity<?> transactionInformation(@PathVariable("trId") long id) {
-        return new ResponseEntity<>(transactionService.findById(id), null, HttpStatus.OK);
+    @GetMapping("/search")
+    public ResponseEntity<?> transactionById(
+            @RequestParam(required = false, defaultValue = "", value = "id") long trId) {
+        return new ResponseEntity<>(transactionService.findById(trId).orElse(null), HttpStatus.OK);
     }
 
-    @GetMapping(path = "/{userName}")
-    public ResponseEntity<?> userTransactions(@PathVariable("userName") String name) {
-        return new ResponseEntity<>(transactionService.findByUserName(name), null, HttpStatus.OK);
+    @GetMapping(path = "/search")
+    public ResponseEntity<?> transactionsByUserId(
+            @RequestParam(required = false, defaultValue = "", value = "userId") long userId) {
+        return new ResponseEntity<>(transactionService.findByUserId(userId), HttpStatus.OK);
     }
+
+    @GetMapping(path = "/search")
+    public ResponseEntity<?> transactionsByUserName(
+            @RequestParam(required = false, defaultValue = "", value = "userName") String name) {
+        return new ResponseEntity<>(transactionService.findByUserName(name), HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/search")
+    public ResponseEntity<?> transactionsByBillId(
+            @RequestParam(required = false, defaultValue = "", value = "billId") long billId) {
+        return new ResponseEntity<>(transactionService.findByBillId(billId), HttpStatus.OK);
+    }
+
+
 
 }

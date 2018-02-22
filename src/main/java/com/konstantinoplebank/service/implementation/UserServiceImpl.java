@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -33,18 +34,14 @@ public class UserServiceImpl implements UserService {
     private final UserDao userDao;
     private final BillService billService;
     private final TransactionService transactionService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao, BillService billService, TransactionService transactionService) {
+    public UserServiceImpl(UserDao userDao, BillService billService, TransactionService transactionService, PasswordEncoder passwordEncoder) {
         this.userDao = userDao;
         this.billService = billService;
         this.transactionService = transactionService;
-    }
-
-    @Override
-    public long save(User user) throws Exception {
-        userDao.update(user);
-        return user.getId();
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -84,7 +81,7 @@ public class UserServiceImpl implements UserService {
         User user = new User(
                 userProfile.getName(),
                 userProfile.getEmail(),
-                new BCryptPasswordEncoder().encode(userProfile.getPassword()),
+                passwordEncoder.encode(userProfile.getPassword()),
                 userProfile.getDescription(),
                 userProfile.getAddress(),
                 userProfile.getAge(),
@@ -117,5 +114,25 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean existsByName(String name) {
         return userDao.existsByName(name);
+    }
+
+    @Override
+    public void createBill(long userId, long amount) {
+        billService.create(userId, amount);
+    }
+
+    @Override
+    public Optional<Bill> getBill(long billiId) {
+        return billService.findById(billiId);
+    }
+
+    @Override
+    public void createTransaction(long amount, String description, long billId, long userId) {
+        transactionService.create(userId, billId, amount, description);
+    }
+
+    @Override
+    public Optional<Transaction> getTransaction(long trId) {
+        return transactionService.findById(trId);
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -37,8 +38,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction findById(long id) {
-        return transactionDao.findTransactionById(id).orElseThrow(TransactionNotFoundException::new);
+    public Optional<Transaction> findById(long id) {
+        return transactionDao.findTransactionById(id);
     }
 
     @Override
@@ -70,5 +71,10 @@ public class TransactionServiceImpl implements TransactionService {
         transactionDao.createTransaction(transaction);
         billService.applyTransaction(transaction);
         return transaction.getId();
+    }
+
+    @Override
+    public List<Transaction> findAll() {
+        return transactionDao.findAll();
     }
 }

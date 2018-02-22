@@ -17,5 +17,7 @@ public interface TransactionDao{
 
     List<Transaction> findTransactionsByUserName(String name);
 
+    List<Transaction> findAll();
+
     void createTransaction(Transaction transaction);
 }
