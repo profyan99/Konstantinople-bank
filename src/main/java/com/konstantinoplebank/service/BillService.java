@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BillService {
-    Optional<Bill> findById(long id);
+    Optional<Bill> findById(long Id, long userId);
 
     List<Bill> findByUserId(long id);
 
@@ -15,7 +15,7 @@ public interface BillService {
 
     List<Bill> findAll();
 
-    long create(long userId, long amount);
+    Bill create(long userId, long amount);
 
     void applyTransaction(Transaction transaction);
 

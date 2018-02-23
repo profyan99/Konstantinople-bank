@@ -28,8 +28,8 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public Optional<Bill> findById(long id) {
-        return billDao.findBillById(id);
+    public Optional<Bill> findById(long id, long userId) {
+        return billDao.findBillById(id, userId);
     }
 
     @Override
@@ -38,15 +38,15 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public long create(long userid, long amount) {
+    public Bill create(long userid, long amount) {
         User user = userService.getById(userid).orElseThrow(() -> new UsernameNotFoundException("id "+userid));
         Bill bill = new Bill(user, amount);
         billDao.createBill(bill);
-        return bill.getId();
+        return bill;
     }
 
     @Override
-    public void applyTransaction(Transaction transaction) {
+    public void applyTransaction(Transaction transaction) throws InvalidTransaction {
         Bill currBill = transaction.getBill();
         if(currBill.getAmount() + transaction.getAmount() >= 0) {
             currBill.setAmount(currBill.getAmount() + transaction.getAmount());

@@ -1,19 +1,21 @@
 package com.konstantinoplebank.service.implementation;
 
-import com.konstantinoplebank.entity.User;
 import com.konstantinoplebank.dao.UserDao;
 import com.konstantinoplebank.entity.Bill;
 import com.konstantinoplebank.entity.Role;
 import com.konstantinoplebank.entity.Transaction;
+import com.konstantinoplebank.entity.User;
+import com.konstantinoplebank.response.UserBill;
 import com.konstantinoplebank.response.UserProfile;
+import com.konstantinoplebank.response.UserTransaction;
 import com.konstantinoplebank.service.BillService;
 import com.konstantinoplebank.service.TransactionService;
 import com.konstantinoplebank.service.UserService;
+import com.konstantinoplebank.utils.exception.InvalidTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +48,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserProfile> findAll() {
-        return new ArrayList<>(userDao.findAll());
+        List<UserProfile> users = new ArrayList<>();
+        userDao.findAll().forEach((user -> users.add(new UserProfile(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getPassword(),
+                user.getDescription(),
+                user.getAddress(),
+                user.getAge(),
+                user.getRoles()
+        ))));
+        return users;
     }
 
     @Override
@@ -77,7 +90,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public long create(UserProfile userProfile) {
+    public UserProfile create(UserProfile userProfile) {
         User user = new User(
                 userProfile.getName(),
                 userProfile.getEmail(),
@@ -88,7 +101,8 @@ public class UserServiceImpl implements UserService {
                 new HashSet<>(Collections.singletonList(Role.USER)));
 
         userDao.create(user);
-        return user.getId();
+        return new UserProfile(user.getId(), user.getName(), user.getEmail(), user.getPassword(), user.getDescription(),
+                user.getAddress(), user.getAge(), user.getRoles());
     }
     @Override
     public Set<Bill> getUserBills(long id) {
@@ -101,9 +115,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserProfile getUserProfile(long id) {
-        return userDao.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("id: "+id));
+    public Optional<UserProfile> getUserProfile(long id) {
+        User user = userDao.findById(id).orElseThrow(() -> new UsernameNotFoundException("id: "+id));
+        return Optional.of(new UserProfile()
+                {{
+                    setId(user.getId());
+                    setAddress(user.getAddress());
+                    setAge(user.getAge());
+                    setDescription(user.getDescription());
+                    setEmail(user.getEmail());
+                    setName(user.getName());
+                    setRoles(user.getRoles());
+                    setPassword(user.getPassword());
+                }});
     }
 
     @Override
@@ -117,22 +141,35 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void createBill(long userId, long amount) {
-        billService.create(userId, amount);
+    public UserBill createBill(long userId, long amount) {
+        Bill bill = billService.create(userId, amount);
+        if(bill.getId() == 0) {
+            return null;
+        }
+        else {
+            return new UserBill(bill.getId(), bill.getTransactions(), bill.getAmount());
+        }
     }
 
     @Override
-    public Optional<Bill> getBill(long billiId) {
-        return billService.findById(billiId);
+    public Optional<Bill> getBill(long billiId, long userId) {
+        return billService.findById(billiId, userId);
     }
 
     @Override
-    public void createTransaction(long amount, String description, long billId, long userId) {
-        transactionService.create(userId, billId, amount, description);
+    public UserTransaction createTransaction(long amount, String description, long billId, long userId) {
+        try {
+            Transaction transaction = transactionService.create(userId, billId, amount, description);
+            return new UserTransaction(transaction.getId(), transaction.getUser().getId(), transaction.getBill().getId(),
+                    transaction.getAmount(), transaction.getDate(), transaction.getDescription());
+        } catch (InvalidTransaction e) {
+            return null;
+        }
+
     }
 
     @Override
-    public Optional<Transaction> getTransaction(long trId) {
-        return transactionService.findById(trId);
+    public Optional<Transaction> getTransaction(long trId, long billId, long userId) {
+        return transactionService.findById(trId, billId, userId);
     }
 }

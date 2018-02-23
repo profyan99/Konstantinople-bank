@@ -28,12 +28,12 @@ public class BillDaoImpl implements BillDao {
     }
 
     @Override
-    public Optional<Bill> findBillById(long id) {
+    public Optional<Bill> findBillById(long id, long userId) {
         Optional<Bill> bill = Optional.empty();
         try (SqlSession session = sessionFactory.openSession()) {
             bill = Optional.of(session
                     .getMapper(BillMapper.class)
-                    .findBillById(id));
+                    .findBillById(id, userId));
             return bill;
         } catch (RuntimeException e) {
             logger.error("Couldn't findById: " + e.toString());
@@ -56,16 +56,18 @@ public class BillDaoImpl implements BillDao {
     }
 
     @Override
-    public void createBill(Bill bill) {
+    public Bill createBill(Bill bill) {
         SqlSession session = sessionFactory.openSession();
         try {
             session
                     .getMapper(BillMapper.class)
                     .createBill(bill);
             session.commit();
+            return bill;
         } catch (RuntimeException e) {
             logger.error("Couldn't create bill: "+e.toString());
             session.rollback();
+            return bill;
         } finally {
             session.close();
         }

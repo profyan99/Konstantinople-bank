@@ -1,9 +1,11 @@
 package com.konstantinoplebank.service;
 
 import com.konstantinoplebank.entity.Bill;
-import com.konstantinoplebank.entity.User;
-import com.konstantinoplebank.response.UserProfile;
 import com.konstantinoplebank.entity.Transaction;
+import com.konstantinoplebank.entity.User;
+import com.konstantinoplebank.response.UserBill;
+import com.konstantinoplebank.response.UserProfile;
+import com.konstantinoplebank.response.UserTransaction;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,13 +27,13 @@ public interface UserService {
 
     void update(UserProfile user);
 
-    void createBill(long userId, long amount);
+    UserBill createBill(long userId, long amount);
 
-    Optional<Bill> getBill(long billiId);
+    Optional<Bill> getBill(long id, long userId);
 
-    void createTransaction(long amount, String description, long billId, long userId);
+    UserTransaction createTransaction(long amount, String description, long billId, long userId);
 
-    Optional<Transaction> getTransaction(long trId);
+    Optional<Transaction> getTransaction(long trId, long billId, long userId);
 
     boolean existsById(Long id);
 
@@ -39,11 +41,11 @@ public interface UserService {
 
     void delete(User user);
 
-    long create(UserProfile userProfile);
+    UserProfile create(UserProfile userProfile);
 
     Set<Bill> getUserBills(long id);
 
     Set<Transaction> getUserTransactions(long id);
 
-    UserProfile getUserProfile(long id);
+    Optional<UserProfile> getUserProfile(long id);
 }

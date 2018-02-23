@@ -1,9 +1,9 @@
 package com.konstantinoplebank;
 
-import com.konstantinoplebank.security.SecurityLogoutSuccessHandler;
 import com.konstantinoplebank.security.SecurityAuthenticationEntryPoint;
 import com.konstantinoplebank.security.SecurityAuthenticationFailureHandler;
 import com.konstantinoplebank.security.SecurityAuthenticationSuccessHandler;
+import com.konstantinoplebank.security.SecurityLogoutSuccessHandler;
 import com.konstantinoplebank.service.implementation.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

@@ -6,11 +6,12 @@ import com.konstantinoplebank.entity.Transaction;
 import com.konstantinoplebank.service.BillService;
 import com.konstantinoplebank.service.TransactionService;
 import com.konstantinoplebank.utils.exception.BillNotFoundException;
-import com.konstantinoplebank.utils.exception.TransactionNotFoundException;
+import com.konstantinoplebank.utils.exception.InvalidTransaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +29,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionDao transactionDao;
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final BillService billService;
 
@@ -38,8 +40,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Optional<Transaction> findById(long id) {
-        return transactionDao.findTransactionById(id);
+    public Optional<Transaction> findById(long id, long billId, long userId) {
+        return transactionDao.findTransactionById(id, billId, userId);
     }
 
     @Override
@@ -58,8 +60,8 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public long create(long userId, long billId, long amount, String description) {
-        Bill bill = billService.findById(billId).orElseThrow(BillNotFoundException::new);
+    public Transaction create(long userId, long billId, long amount, String description) throws InvalidTransaction {
+        Bill bill = billService.findById(billId, userId).orElseThrow(BillNotFoundException::new);
         Transaction transaction =
                 new Transaction(
                         bill.getUser(),
@@ -68,9 +70,15 @@ public class TransactionServiceImpl implements TransactionService {
                         new Date(),
                         description
                 );
-        transactionDao.createTransaction(transaction);
-        billService.applyTransaction(transaction);
-        return transaction.getId();
+        try {
+            billService.applyTransaction(transaction);
+            transactionDao.createTransaction(transaction);
+            return transaction;
+        } catch (InvalidTransaction i) {
+            logger.error("Could not create Transaction: "+i.toString());
+            throw i;
+        }
+        // TODO maybe rewrite this method without try\catch or this Spring Transactional
     }
 
     @Override

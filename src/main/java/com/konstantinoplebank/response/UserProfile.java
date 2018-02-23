@@ -20,6 +20,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class UserProfile {
 
+    private long id;
     private String name;
     private String email;
     private String password;
@@ -28,4 +29,7 @@ public class UserProfile {
     private int age;
     private Set<Role> roles;
 
+    public UserProfile(String name, String email, String password, String description, String address, int age, Set<Role> roles) {
+        this(0, name, email, password, description, address, age, roles);
+    }
 }

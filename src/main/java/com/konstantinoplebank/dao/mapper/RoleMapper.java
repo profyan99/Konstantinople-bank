@@ -2,7 +2,6 @@ package com.konstantinoplebank.dao.mapper;
 
 import com.konstantinoplebank.entity.Role;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.security.access.method.P;
 
 import java.util.List;
 

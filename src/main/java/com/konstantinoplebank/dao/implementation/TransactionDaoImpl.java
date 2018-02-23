@@ -2,11 +2,9 @@ package com.konstantinoplebank.dao.implementation;
 
 import com.konstantinoplebank.dao.TransactionDao;
 import com.konstantinoplebank.dao.mapper.TransactionMapper;
-import com.konstantinoplebank.dao.mapper.UserMapper;
 import com.konstantinoplebank.entity.Transaction;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.mybatis.spring.support.SqlSessionDaoSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +28,12 @@ public class TransactionDaoImpl implements TransactionDao {
     }
 
     @Override
-    public Optional<Transaction> findTransactionById(long id) {
+    public Optional<Transaction> findTransactionById(long id, long billId, long userId) {
         Optional<Transaction> transaction = Optional.empty();
         try (SqlSession session = sessionFactory.openSession()) {
             transaction = Optional.of(session
                     .getMapper(TransactionMapper.class)
-                    .findTransactionById(id));
+                    .findTransactionById(id, billId, userId));
             return transaction;
         } catch (RuntimeException e) {
             logger.error("Couldn't findTransactionById: " + e.toString());
@@ -58,16 +56,18 @@ public class TransactionDaoImpl implements TransactionDao {
     }
 
     @Override
-    public void createTransaction(Transaction transaction) {
+    public Transaction createTransaction(Transaction transaction) {
         SqlSession session = sessionFactory.openSession();
         try {
             session
                     .getMapper(TransactionMapper.class)
                     .createTransaction(transaction);
             session.commit();
+            return transaction;
         } catch (RuntimeException e) {
             logger.error("Couldn't create: "+e.toString());
             session.rollback();
+            return transaction;
         } finally {
             session.close();
         }

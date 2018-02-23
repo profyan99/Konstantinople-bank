@@ -2,17 +2,17 @@ package com.konstantinoplebank.controller;
 
 
 import com.konstantinoplebank.entity.Bill;
-import com.konstantinoplebank.response.UserBill;
 import com.konstantinoplebank.service.BillService;
-import com.konstantinoplebank.utils.exception.BillNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Controller, which handle queries of {@link Bill} only for {@link com.konstantinoplebank.entity.Role} ADMIN
@@ -35,26 +35,45 @@ public class BillController {
 
     @GetMapping
     public ResponseEntity<?> allBills() {
-        return new ResponseEntity<>(billService.findAll(), HttpStatus.OK);
+        ResponseEntity resp = ResponseEntity.noContent().build();
+        List<Bill> bills = billService.findAll();
+            if(!bills.isEmpty()) {
+            resp = ResponseEntity.ok(bills);
+        }
+        return resp;
     }
 
     @GetMapping("/search")
     public ResponseEntity<?> billById(
             @RequestParam(required = false, defaultValue = "", value = "id") long billId) {
-        Bill bill = billService.findById(billId).orElseThrow(BillNotFoundException::new);
-        return new ResponseEntity<>(new UserBill(bill.getId(),bill.getTransactions(), bill.getAmount()), HttpStatus.OK);
+        ResponseEntity resp = ResponseEntity.notFound().build();
+        Optional<Bill> bill = billService.findById(billId, 0);
+        if(bill.isPresent()) {
+            resp = ResponseEntity.ok(bill.get());
+        }
+        return resp;
     }
 
     @GetMapping(path = "/search")
     public ResponseEntity<?> billByUserId(
             @RequestParam(required = false, defaultValue = "", value = "userId") long userId) {
-        return new ResponseEntity<>(billService.findByUserId(userId), HttpStatus.OK);
+        ResponseEntity resp = ResponseEntity.noContent().build();
+        List<Bill> bills = billService.findByUserId(userId);
+        if(!bills.isEmpty()) {
+            resp = ResponseEntity.ok(bills);
+        }
+        return resp;
     }
 
     @GetMapping(path = "/search")
     public ResponseEntity<?> billByUserName(
             @RequestParam(required = false, defaultValue = "", value = "userName") String name) {
-        return new ResponseEntity<>(billService.findByUserName(name), HttpStatus.OK);
+        ResponseEntity resp = ResponseEntity.noContent().build();
+        List<Bill> bills = billService.findByUserName(name);
+        if(!bills.isEmpty()) {
+            resp = ResponseEntity.ok(bills);
+        }
+        return resp;
     }
 
 }

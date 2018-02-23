@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface TransactionMapper {
-    Transaction findTransactionById(long id);
+    Transaction findTransactionById(@Param("id") long id, @Param("billId") long billId, @Param("userId") long userId);
 
     List<Transaction> findTransactionsByUserId(long id);
 

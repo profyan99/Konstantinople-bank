@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface TransactionDao{
-    Optional<Transaction> findTransactionById(long id);
+    Optional<Transaction> findTransactionById(long id, long billId, long userId);
 
     List<Transaction> findTransactionsByUserId(long id);
 
@@ -19,5 +19,5 @@ public interface TransactionDao{
 
     List<Transaction> findAll();
 
-    void createTransaction(Transaction transaction);
+    Transaction createTransaction(Transaction transaction);
 }

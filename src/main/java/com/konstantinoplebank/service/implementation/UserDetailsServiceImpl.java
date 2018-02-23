@@ -1,7 +1,6 @@
 package com.konstantinoplebank.service.implementation;
 
 import com.konstantinoplebank.dao.UserDao;
-import com.konstantinoplebank.entity.Role;
 import com.konstantinoplebank.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Set;

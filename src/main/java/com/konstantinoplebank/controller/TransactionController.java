@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+import java.util.Optional;
+
 /**
  * Controller, which handle queries of {@link Transaction} only for {@link com.konstantinoplebank.entity.Role} ADMIN
  *
@@ -32,19 +35,34 @@ public class TransactionController {
 
     @GetMapping
     public ResponseEntity<?> allTransactions() {
-        return new ResponseEntity<>(transactionService.findAll(), HttpStatus.OK);
+        ResponseEntity resp = ResponseEntity.noContent().build();
+        List<Transaction> transactions = transactionService.findAll();
+        if(!transactions.isEmpty()) {
+            resp = ResponseEntity.ok(transactions);
+        }
+        return resp;
     }
 
     @GetMapping("/search")
     public ResponseEntity<?> transactionById(
             @RequestParam(required = false, defaultValue = "", value = "id") long trId) {
-        return new ResponseEntity<>(transactionService.findById(trId).orElse(null), HttpStatus.OK);
+        ResponseEntity resp = ResponseEntity.notFound().build();
+        Optional<Transaction> transaction = transactionService.findById(trId, 0, 0);
+        if(transaction.isPresent()) {
+            resp = ResponseEntity.ok(transaction.get());
+        }
+        return resp;
     }
 
     @GetMapping(path = "/search")
     public ResponseEntity<?> transactionsByUserId(
             @RequestParam(required = false, defaultValue = "", value = "userId") long userId) {
-        return new ResponseEntity<>(transactionService.findByUserId(userId), HttpStatus.OK);
+        ResponseEntity resp = ResponseEntity.noContent().build();
+        List<Transaction> transactions = transactionService.findByUserId(userId);
+        if(!transactions.isEmpty()) {
+            resp = ResponseEntity.ok(transactions);
+        }
+        return resp;
     }
 
     @GetMapping(path = "/search")
@@ -56,7 +74,12 @@ public class TransactionController {
     @GetMapping(path = "/search")
     public ResponseEntity<?> transactionsByBillId(
             @RequestParam(required = false, defaultValue = "", value = "billId") long billId) {
-        return new ResponseEntity<>(transactionService.findByBillId(billId), HttpStatus.OK);
+        ResponseEntity resp = ResponseEntity.noContent().build();
+        List<Transaction> transactions = transactionService.findByBillId(billId);
+        if(!transactions.isEmpty()) {
+            resp = ResponseEntity.ok(transactions);
+        }
+        return resp;
     }
 
 

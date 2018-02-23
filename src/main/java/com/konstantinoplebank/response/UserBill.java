@@ -12,8 +12,13 @@ import java.util.Set;
 public class UserBill {
     private long id;
 
+    private long userId;
+
     private Set<Transaction> transactions = new HashSet<>();
 
     private long amount;
 
+    public UserBill(long userId, Set<Transaction> transactions, long amount) {
+        this(0, userId, transactions, amount);
+    }
 }

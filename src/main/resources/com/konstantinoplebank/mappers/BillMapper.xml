@@ -20,6 +20,9 @@
 
     <select id="findBillById" parameterType="_long" resultMap="BillResult">
         SELECT * FROM bills WHERE id=#{id}
+        <if test="userId != 0">
+            AND user=#{userId}
+        </if>
     </select>
 
     <select id="findAll" resultMap="BillResult">

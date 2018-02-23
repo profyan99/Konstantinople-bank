@@ -20,6 +20,12 @@
 
     <select id="findTransactionById" parameterType="_long" resultMap="TransactionResult">
         SELECT * FROM transactions WHERE id=#{id}
+        <if test="userId != 0">
+            AND user=#{userId}
+        </if>
+        <if test="billId != 0">
+            AND bill=#{billId}
+        </if>
     </select>
 
     <select id="findAll" resultMap="TransactionResult">

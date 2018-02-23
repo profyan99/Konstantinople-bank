@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface BillMapper {
-    Bill findBillById(long id);
+    Bill findBillById(@Param("id") long id, @Param("userId") long userId);
 
     List<Bill> findBillsByUserId(long id);
 
