@@ -20,7 +20,7 @@ Application handle users operations with bills:
 
 But this is only the main functional, your fantasy isn't limited, so you can add more functionality.
 
-#### At the moment there are two realizations in two branches:
+#### At the moment there are three realizations in two branches:
 
 * With Hibernate and Spring Data - **master**
 * With JdbcTemplate only - **JdbcTemplate**
