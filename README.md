@@ -10,7 +10,7 @@ and selected by me technologies. Good luck!
 
 This is a pure version of online bank, which contains
 * clients
-* bills
+* bills(Accounts)
 * transactions
 
 Application handle users operations with bills:
@@ -24,7 +24,7 @@ But this is only the main functional, your fantasy isn't limited, so you can add
 
 * With Hibernate and Spring Data - **master**
 * With JdbcTemplate only - **JdbcTemplate**
-
+* With MyBatis - **MyBatis**(main)
 
 ## Technology stack:  ###
 #### Backend
@@ -36,6 +36,7 @@ But this is only the main functional, your fantasy isn't limited, so you can add
 * Flyway
 * MySQL 
 * Maven
+* MyBatis
 
 #### Frontend
 * Vue.js
@@ -57,13 +58,13 @@ But this is only the main functional, your fantasy isn't limited, so you can add
 
 ### Configure connection to database
 
-* Open config file **application.properties**, which is located at *src\main\resources*
+* Open config file **db.properties**, which is located at *src\main\resources*
 * Edit these fields
   
-      spring.datasource.url   
-      spring.datasource.username
-      spring.datasource.password
-      spring.datasource.driver-class-name
+      db.url
+      db.username
+      db.password
+      db.driver
             
 ### Configure CORS settings
 
